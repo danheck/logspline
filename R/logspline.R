@@ -17,14 +17,16 @@ plogspline <- function(q, fit)
     sq <- rank(q)
     q <- sort(q)
     z <- .C("pqlsd",
-        as.double(fit$coef),
-        as.double(fit$knots),
-        as.double(fit$bound),
-        as.integer(1),
-        pp = as.double(q),
-        as.double(q),
-        as.integer(length(fit$knots)),
-        as.integer(length(q)))
+            as.double(fit$coef),
+            as.double(fit$knots),
+            as.double(fit$bound),
+            as.integer(1),
+            pp = as.double(q),
+            as.double(q),
+            as.integer(length(fit$knots)),
+            as.integer(length(q)),
+            PACKAGE="logspline"
+            )
     zz <- z$pp[sq]
     if(fit$bound[1] > 0)
         zz[q<fit$bound[2]] <- 0
@@ -38,14 +40,15 @@ qlogspline <- function(p, fit)
     sp <- rank(p)
     p <- sort(p)
     z <- .C("pqlsd",
-        as.double(fit$coef),
-        as.double(fit$knots),
-        as.double(fit$bound),
-        as.integer(0),
-        as.double(p),
-        qq = as.double(p),
-        as.integer(length(fit$knots)),
-        as.integer(length(p)))
+            as.double(fit$coef),
+            as.double(fit$knots),
+            as.double(fit$bound),
+            as.integer(0),
+            as.double(p),
+            qq = as.double(p),
+            as.integer(length(fit$knots)),
+            as.integer(length(p)),
+            PACKAGE="logspline")
     zz <- z$qq[sp]
     zz[p<0] <- NA
     zz[p>1] <- NA
@@ -293,7 +296,8 @@ logspline.fit <- function(uncensored, right, left, interval, lbound, ubound,
                 as.double(penalty),
                 as.double(sample),
                 as.double(sample),
-                logl = as.double(rep(0, n1 + 1)))
+                logl = as.double(rep(0, n1 + 1)),
+                PACKAGE="logspline")
         bound <- c(z$bd[2], z$bd[3], z$bd[4], z$bd[5])
         SorC <- z$SorC  # error messages
         if(abs(SorC[1]) > 2) {
