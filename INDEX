@@ -1,0 +1,5 @@
+dlogspline               Logspline Density Estimation
+logspline.fit            Logspline Density Estimation
+logspline.plot           Plots a Logspline Density, Distribution
+                         Function, Hazard Function or Survival Function.
+logspline.summary        Summarizes Various Logspline Density Estimates
