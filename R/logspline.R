@@ -32,7 +32,8 @@ poldlogspline <- function(q, fit)
         pp = as.double(q),
         as.double(q),
         as.integer(length(fit$knots)),
-        as.integer(length(q)))
+        as.integer(length(q)),
+        PACKAGE = "logspline")
     zz <- z$pp[sq]
     if(fit$bound[1] > 0)
         zz[q<fit$bound[2]] <- 0
@@ -56,7 +57,8 @@ qoldlogspline <- function(p, fit)
         as.double(p),
         qq = as.double(p),
         as.integer(length(fit$knots)),
-        as.integer(length(p)))
+        as.integer(length(p)),
+        PACKAGE = "logspline")
     zz <- z$qq[sp]
     zz[p<0] <- NA
     zz[p>1] <- NA
@@ -323,7 +325,8 @@ oldlogspline <- function(uncensored, right, left, interval, lbound, ubound,
                 as.double(penalty),
                 as.double(sample),
                 as.double(sample),
-                logl = as.double(rep(0, n1 + 1)))
+                logl = as.double(rep(0, n1 + 1)),
+        PACKAGE = "logspline")
         bound <- c(z$bd[2], z$bd[3], z$bd[4], z$bd[5])
         SorC <- z$SorC  # error messages
         if(abs(SorC[1]) > 2) {
@@ -421,7 +424,8 @@ logspline <- function(x, lbound, ubound, maxknots=0, knots, nknots=0,
 
    # get the maximal dimension
    intpars <- c(-100, rep(0, 9))
-   z <- .C("nlogcensorx", z = as.integer(intpars))
+   z <- .C("nlogcensorx", z = as.integer(intpars),
+        PACKAGE = "logspline")
    maxp <- z$z[1]
 
    # organize knots
@@ -454,7 +458,8 @@ logspline <- function(x, lbound, ubound, maxknots=0, knots, nknots=0,
       dp = as.double(dpars),
       logl = as.double(rep(0, maxp)),
       ad = as.integer(rep(0, maxp)),
-      kts = as.double(kts))
+      kts = as.double(kts),
+        PACKAGE = "logspline")
 
    # error messages
    if(z$ip[1] != 0 && z$ip[1]<100) {
@@ -514,7 +519,8 @@ plogspline <- function(q, fit)
         as.integer(1),
         pp = as.double(q),
         as.integer(length(fit$knots)),
-        as.integer(length(q)))
+        as.integer(length(q)),
+        PACKAGE = "logspline")
     zz <- z$pp[sq]
     if(fit$bound[1] > 0) zz[q<fit$bound[2]] <- 0
     if(fit$bound[3] > 0) zz[q>fit$bound[4]] <- 1
@@ -534,7 +540,8 @@ qlogspline <- function(p, fit)
         as.integer(0),
         qq = as.double(p),
         as.integer(length(fit$knots)),
-        as.integer(length(p)))
+        as.integer(length(p)),
+        PACKAGE = "logspline")
     zz <- z$qq[sp]
     zz[p<0] <- NA
     zz[p>1] <- NA
