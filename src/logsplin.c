@@ -14,7 +14,9 @@
 * For questions, please email clk@stat.washington.edu                          *
 *                       Charles Kooperberg, April 21, 1993                     *
 *******************************************************************************/
-#include "S.h"
+#include "R.h"
+#undef error
+
 #include <math.h>
 #include <stdio.h>
 #define NC 50

@@ -1,12 +1,12 @@
 \name{dlogspline}
 \alias{dlogspline}
-\alias{plogspiine}
+\alias{plogspline}
 \alias{qlogspline}
 \alias{rlogspline}
 \title{
 Logspline Density Estimation
 }
-\section{DESCRIPTION}{
+\description{
 Density, cumulative probability, quantiles and random samples from
 a logspline density.
 }
@@ -34,16 +34,12 @@ a list like the output from \code{logspline.fit}.
 densities (\code{dlogspline}), probabilities (\code{plogspline}), quantiles (\code{qlogspline}),
 or a random sample (\code{rlogspline}) from a logspline density.
 }
-\section{Side Effects}{
-The  function  \code{rlogspline} causes creation of the  
-dataset \code{.Random.seed} if it does not already exist, otherwise its
-value is updated.
-}
-\section{DETAILS:}{
+\details{
 Elements of \code{q} or \code{p} that are missing will cause the
 corresponding elements of the result to be missing.
 }
 \seealso{
-\code{\link{logspline.fit}}, \code{\link{logspline.plot}}, \code{\link{logspline.summary}}
+  \code{\link{logspline.fit}}, \code{\link{logspline.plot}},
+  \code{\link{logspline.summary}}
 }
-% Converted by Sd2Rd version 0.2-a5.
+\keyword{smooth}

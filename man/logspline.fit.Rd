@@ -3,7 +3,7 @@
 \title{
 Logspline Density Estimation
 }
-\section{DESCRIPTION}{
+\description{
 logspline.fit: density estimation using splines to
 approximate the log-density.
 }
@@ -54,8 +54,8 @@ If \code{knots} is not specified, a default knot-placement rule is employed.
 }
 \item{penalty}{
 the parameter to be used in the AIC criterion. The method chooses
-the number of knots that minimizes `
--2*loglikelihood+penalty*(number of knots-1)'.
+the number of knots that minimizes
+\code{-2*loglikelihood+penalty*(number of knots-1)}.
 The default is to use \code{penalty=log(samplesize)} as in BIC. The effect of
 this parameter is summarized in \code{logspline.summary}.
 }
@@ -76,10 +76,11 @@ vector of the locations of the knots in the logspline model.
 }
 \item{coef}{
 coefficients of the spline. The first coefficient is the constant term,
-the second is the linear term and the k-th (k>2) is the coefficient
-of (x-t(k-2))^3+ (where ^3+ means the positive part of the third power,
-and t(k-2) means knot k-2). If a coefficient is zero the corresponding
-knot was deleted from the model.
+the second is the linear term and the k-th (k > 2) is the coefficient
+of \eqn{(x-t_{(k-2)})^3_+}{(x-t(k-2))^3+}
+(where \eqn{\phantom{|}^3_+}{^3+} means the positive part of the third power,
+and \eqn{t_{(k-2)}}{t(k-2)} means knot \eqn{k-2}). If a coefficient
+is zero the corresponding knot was deleted from the model.
 }
 \item{bound}{
 first element: 0 - \code{lbound} was -infinity, 1 it was something else; second
@@ -115,12 +116,22 @@ Censored Data.
 \code{\link{dlogspline}}, \code{\link{plogspline}}, \code{\link{qlogspline}}, \code{\link{rlogspline}}. 
 }
 \examples{
-estimate the density of a positive random variable when some of the
-observations are right censored, and generate 50 random numbers from
-the estimated density:
+data(faithful)
+attach(faithful)
+fit <- logspline.fit(eruptions, lbound=0)
+logspline.summary(fit)
+plot(x=c(0, 6), y=c(0,1), type="n", bty="l",
+     xlab="duration of eruption", ylab="density")
+rug(eruptions)
+x <- seq(0, 6, length=500)
+lines(x, dlogspline(x, fit))
 
+library(stepfun)
+plot(ecdf(eruptions), verticals=TRUE, do.points=FALSE)
+lines(x, plogspline(x, fit), col="blue")
 
-fit <- logspline.fit(y, y2, lbound=0)
 rlogspline(50, fit)
+
+detach("faithful")
 }
-% Converted by Sd2Rd version 0.2-a5.
+\keyword{smooth}

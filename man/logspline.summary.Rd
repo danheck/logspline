@@ -3,6 +3,9 @@
 \title{
 Summarizes Various Logspline Density Estimates
 }
+\description{
+  Summarizes various logspline density estimates.
+}
 \usage{
 logspline.summary(fit)
 }
@@ -15,7 +18,7 @@ This function produces only printed output. The main body
 is a table with five columns: the first column is a possible number
 of knots for the fitted model;
 the second column is the log-likelihood for the fit;
-the third column is -2*loglikelihood + penalty*(number of knots-1),
+the third column is \code{-2*loglikelihood + penalty*(number of knots-1)},
 which is the AIC criterion - logspline.fit selected the model with
 the smallest value of AIC;
 the fourth and fifth columns give the
@@ -26,10 +29,8 @@ number of knots corresponding to the selected model is reported, as is
 the value of penalty that was used.
 }
 \seealso{
-\code{\link{logspline.fit}}, \code{\link{logspline.plot}}, \code{\link{dlogspline}}, \code{\link{plogspline}}, \code{\link{qlogspline}}, \code{\link{rlogspline}}.
+  \code{\link{logspline.fit}}, \code{\link{logspline.plot}},
+  \code{\link{dlogspline}}, \code{\link{plogspline}},
+  \code{\link{qlogspline}}, \code{\link{rlogspline}}.
 }
-\examples{
-fit <- logspline.fit(y) 
-logspline.summary(fit)
-}
-% Converted by Sd2Rd version 0.2-a5.
+\keyword{smooth}
