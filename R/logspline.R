@@ -111,7 +111,7 @@ logspline.summary <- function(fit)
 {
     if(fit$delete==FALSE)
         stop(paste("logspline.summary can only provide",
-       "information if delete in logspline.fit is T"))
+       "information if delete in logspline.fit is TRUE"))
     ul <- fit$penalty
     um <- fit$sample
     ll <- fit$logl
@@ -165,8 +165,9 @@ logspline.summary <- function(fit)
     invisible()
 }
 
-logspline.fit <- function(uncensored, right, left, interval, lbound, ubound,
-        nknots, knots, penalty, delete = TRUE)
+logspline.fit <-
+    function(uncensored, right, left, interval, lbound = -Inf, ubound = Inf,
+             nknots, knots, penalty, delete = TRUE)
 {
     nsample <- rep(0, 6)
     # interval is the nterval censored data - a matrix with two columns
