@@ -7,6 +7,9 @@ Plots a Logspline Density, Distribution Function, Hazard Function or Survival Fu
   Plots a logspline density, distribution function, hazard function or
   survival function.
 }
+\synopsis{
+logspline.plot(fit, n=100, what="d", xlim, xlab, ylab, type, \dots)
+}
 \usage{
 logspline.plot(fit, n=100, what="d", \dots)
 }

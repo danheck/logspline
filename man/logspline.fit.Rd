@@ -10,7 +10,7 @@ approximate the log-density.
 \usage{
 logspline.fit(uncensored, right, left, interval, 
               lbound= -Inf, ubound=Inf,
-              nknots, knots, penalty, delete=T)
+              nknots, knots, penalty, delete=TRUE)
 }
 \arguments{
 \item{uncensored}{

@@ -106,7 +106,8 @@ logspline.plot <- function(fit, n = 100, what = "d", xlim, xlab, ylab, type, ...
 
 logspline.summary <- function(fit)
 {
-    if(fit$delete==F)stop(paste("logspline.summary can only provide",
+    if(fit$delete==FALSE)
+        stop(paste("logspline.summary can only provide",
        "information if delete in logspline.fit is T"))
     ul <- fit$penalty
     um <- fit$sample
@@ -114,9 +115,9 @@ logspline.summary <- function(fit)
     kk <- (1:length(ll))
     kk <- kk[ll != 0] + 2
     ll <- ll[ll != 0]
-    error<-F
+    error<-FALSE
     rr <- ll[1:(length(ll)-1)]-ll[2:length(ll)]
-    if(max(rr)>0)error<-T
+    if(max(rr)>0)error<-TRUE
     bb <- -2 * ll + ul * kk
     cc1 <- bb
     cc2 <- bb
@@ -148,8 +149,8 @@ logspline.summary <- function(fit)
     else
         cat(paste("penalty(AIC) was ", round(ul, 2),", the default (BIC) ",
                 "would have been", round(log(um), 2),"\n"))
-    if(min(kk) > 3 && fit$delete==T){
-        cat(paste( "models with fewer than", kk[1],"knots ", 
+    if(min(kk) > 3 && fit$delete==TRUE){
+        cat(paste( "models with fewer than", kk[1],"knots ",
                   "can be fitted, but they are not optimal for\n"))
         cat(paste("the present choice of penalty - choose penalty in",
                   "logspline.fit larger\nto see these fits\n"))
@@ -157,12 +158,12 @@ logspline.summary <- function(fit)
     if(min(kk) > 3 && fit$delete==3)
         cat(paste("models with fewer than", kk[1],"knots ",
                     "were not fitted because of convergence problems\n"))
-      
+
     invisible()
 }
 
 logspline.fit <- function(uncensored, right, left, interval, lbound, ubound,
-        nknots, knots, penalty, delete = T)
+        nknots, knots, penalty, delete = TRUE)
 {
     nsample <- rep(0, 6)
     # interval is the nterval censored data - a matrix with two columns
@@ -204,7 +205,7 @@ logspline.fit <- function(uncensored, right, left, interval, lbound, ubound,
         if(nsample[2]>1)
             nsample[6] <- sum(uncensored[2:nsample[2]] !=
                 uncensored[1:(nsample[2]-1)]) + 1 + nsample[6]
-        else 
+        else
             nsample[6] <- nsample[6]+1
     }
 # we can not run on only right or left censored data
@@ -350,7 +351,7 @@ logspline.fit <- function(uncensored, right, left, interval, lbound, ubound,
         if(delete && SorC[28]>0)delete<-3
         coef <- z$cf[1:(z$nk + 2)]
         uu <- 3:z$nk
-        if(delete == F)uu_1
+        if(delete == FALSE) uu <- 1
         list(coef = coef, knots = z$kt[1:z$nk], bound = bound, logl = z$logl[
                 uu], penalty = penalty, sample = nsample[1], delete = delete)
 }

@@ -1,5 +1,6 @@
 Package: logspline
-Version: 1.0-3
+Version: 1.0-4
+Date: 2001-12-08
 Author: S original by Charles L. Kooperberg.
   R port by  Brian Ripley <ripley@stats.ox.ac.uk>.
 Maintainer: Brian Ripley <ripley@stats.ox.ac.uk>
