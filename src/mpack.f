@@ -73,14 +73,14 @@ C     JAMES BUNCH, UNIV. CALIF. SAN DIEGO, ARGONNE NAT. LAB.
 C
 C     SUBROUTINES AND FUNCTIONS
 C
-C     BLAS XDAXPY,XDSWAP,XIDAMAX
+C     BLAS DAXPY,DSWAP,IDAMAX
 C     FORTRAN DABS,DMAX1,DSQRT
 C
 C     INTERNAL VARIABLES
 C
       DOUBLE PRECISION AK,AKM1,BK,BKM1,DENOM,MULK,MULKM1,T
       DOUBLE PRECISION ABSAKK,ALPHA,COLMAX,ROWMAX
-      INTEGER IMAX,IMAXP1,J,JJ,JMAX,K,KM1,KM2,KSTEP,XIDAMAX
+      INTEGER IMAX,IMAXP1,J,JJ,JMAX,K,KM1,KM2,KSTEP,IDAMAX
       LOGICAL SWAP
 C
 C
@@ -119,7 +119,7 @@ C
 C        DETERMINE THE LARGEST OFF-DIAGONAL ELEMENT IN
 C        COLUMN K.
 C
-         IMAX = XIDAMAX(K-1,A(1,K),1)
+         IMAX = IDAMAX(K-1,A(1,K),1)
          COLMAX = DABS(A(IMAX,K))
          IF (ABSAKK .LT. ALPHA*COLMAX) GO TO 30
             KSTEP = 1
@@ -136,7 +136,7 @@ C
                ROWMAX = DMAX1(ROWMAX,DABS(A(IMAX,J)))
    40       CONTINUE
             IF (IMAX .EQ. 1) GO TO 50
-               JMAX = XIDAMAX(IMAX-1,A(1,IMAX),1)
+               JMAX = IDAMAX(IMAX-1,A(1,IMAX),1)
                ROWMAX = DMAX1(ROWMAX,DABS(A(JMAX,IMAX)))
    50       CONTINUE
             IF (DABS(A(IMAX,IMAX)) .LT. ALPHA*ROWMAX) GO TO 60
@@ -169,7 +169,7 @@ C
 C
 C              PERFORM AN INTERCHANGE.
 C
-               CALL XDSWAP(IMAX,A(1,IMAX),1,A(1,K),1)
+               CALL DSWAP(IMAX,A(1,IMAX),1,A(1,K),1)
                DO 110 JJ = IMAX, K
                   J = K + IMAX - JJ
                   T = A(J,K)
@@ -184,7 +184,7 @@ C
                J = K - JJ
                MULK = -A(J,K)/A(K,K)
                T = MULK
-               CALL XDAXPY(J,T,A(1,K),1,A(1,J),1)
+               CALL DAXPY(J,T,A(1,K),1,A(1,J),1)
                A(J,K) = MULK
   130       CONTINUE
 C
@@ -201,7 +201,7 @@ C
 C
 C              PERFORM AN INTERCHANGE.
 C
-               CALL XDSWAP(IMAX,A(1,IMAX),1,A(1,K-1),1)
+               CALL DSWAP(IMAX,A(1,IMAX),1,A(1,K-1),1)
                DO 150 JJ = IMAX, KM1
                   J = KM1 + IMAX - JJ
                   T = A(J,K-1)
@@ -227,9 +227,9 @@ C
                   MULK = (AKM1*BK - BKM1)/DENOM
                   MULKM1 = (AK*BKM1 - BK)/DENOM
                   T = MULK
-                  CALL XDAXPY(J,T,A(1,K),1,A(1,J),1)
+                  CALL DAXPY(J,T,A(1,K),1,A(1,J),1)
                   T = MULKM1
-                  CALL XDAXPY(J,T,A(1,K-1),1,A(1,J),1)
+                  CALL DAXPY(J,T,A(1,K-1),1,A(1,J),1)
                   A(J,K) = MULK
                   A(J,K-1) = MULKM1
   170          CONTINUE
@@ -293,12 +293,12 @@ C     JAMES BUNCH, UNIV. CALIF. SAN DIEGO, ARGONNE NAT. LAB.
 C
 C     SUBROUTINES AND FUNCTIONS
 C
-C     BLAS XDAXPY,XDDOT
+C     BLAS DAXPY,DDOT
 C     FORTRAN IABS
 C
 C     INTERNAL VARIABLES.
 C
-      DOUBLE PRECISION AK,AKM1,BK,BKM1,XDDOT,DENOM,TEMP
+      DOUBLE PRECISION AK,AKM1,BK,BKM1,DDOT,DENOM,TEMP
       INTEGER K,KP
 C
 C     LOOP BACKWARD APPLYING THE TRANSFORMATIONS AND
@@ -323,7 +323,7 @@ C
 C
 C              APPLY THE TRANSFORMATION.
 C
-               CALL XDAXPY(K-1,B(K),A(1,K),1,B(1),1)
+               CALL DAXPY(K-1,B(K),A(1,K),1,B(1),1)
    30       CONTINUE
 C
 C           APPLY D INVERSE.
@@ -348,8 +348,8 @@ C
 C
 C              APPLY THE TRANSFORMATION.
 C
-               CALL XDAXPY(K-2,B(K),A(1,K),1,B(1),1)
-               CALL XDAXPY(K-2,B(K-1),A(1,K-1),1,B(1),1)
+               CALL DAXPY(K-2,B(K),A(1,K),1,B(1),1)
+               CALL DAXPY(K-2,B(K-1),A(1,K-1),1,B(1),1)
    60       CONTINUE
 C
 C           APPLY D INVERSE.
@@ -378,7 +378,7 @@ C
 C
 C              APPLY THE TRANSFORMATION.
 C
-               B(K) = B(K) + XDDOT(K-1,A(1,K),1,B(1),1)
+               B(K) = B(K) + DDOT(K-1,A(1,K),1,B(1),1)
                KP = KPVT(K)
                IF (KP .EQ. K) GO TO 100
 C
@@ -399,8 +399,8 @@ C
 C
 C              APPLY THE TRANSFORMATION.
 C
-               B(K) = B(K) + XDDOT(K-1,A(1,K),1,B(1),1)
-               B(K+1) = B(K+1) + XDDOT(K-1,A(1,K+1),1,B(1),1)
+               B(K) = B(K) + DDOT(K-1,A(1,K),1,B(1),1)
+               B(K+1) = B(K+1) + DDOT(K-1,A(1,K+1),1,B(1),1)
                KP = IABS(KPVT(K))
                IF (KP .EQ. K) GO TO 130
 C
@@ -483,12 +483,12 @@ C     JAMES BUNCH, UNIV. CALIF. SAN DIEGO, ARGONNE NAT. LAB
 C
 C     SUBROUTINES AND FUNCTIONS
 C
-C     BLAS XDAXPY,XDCOPY,XDDOT,XDSWAP
+C     BLAS DAXPY,DCOPY,DDOT,DSWAP
 C     FORTRAN DABS,IABS,MOD
 C
 C     INTERNAL VARIABLES.
 C
-      DOUBLE PRECISION AKKP1,XDDOT,TEMP
+      DOUBLE PRECISION AKKP1,DDOT,TEMP
       DOUBLE PRECISION TEN,D,T,AK,AKP1
       INTEGER J,JB,K,KM1,KS,KSTEP
       LOGICAL NOINV,NODET,NOERT
@@ -568,12 +568,12 @@ C              1 BY 1
 C
                A(K,K) = 1.0D0/A(K,K)
                IF (KM1 .LT. 1) GO TO 170
-                  CALL XDCOPY(KM1,A(1,K),1,WORK,1)
+                  CALL DCOPY(KM1,A(1,K),1,WORK,1)
                   DO 160 J = 1, KM1
-                     A(J,K) = XDDOT(J,A(1,J),1,WORK,1)
-                     CALL XDAXPY(J-1,WORK(J),A(1,J),1,A(1,K),1)
+                     A(J,K) = DDOT(J,A(1,J),1,WORK,1)
+                     CALL DAXPY(J-1,WORK(J),A(1,J),1,A(1,K),1)
   160             CONTINUE
-                  A(K,K) = A(K,K) + XDDOT(KM1,WORK,1,A(1,K),1)
+                  A(K,K) = A(K,K) + DDOT(KM1,WORK,1,A(1,K),1)
   170          CONTINUE
                KSTEP = 1
             GO TO 220
@@ -590,19 +590,19 @@ C
                A(K+1,K+1) = AK/D
                A(K,K+1) = -AKKP1/D
                IF (KM1 .LT. 1) GO TO 210
-                  CALL XDCOPY(KM1,A(1,K+1),1,WORK,1)
+                  CALL DCOPY(KM1,A(1,K+1),1,WORK,1)
                   DO 190 J = 1, KM1
-                     A(J,K+1) = XDDOT(J,A(1,J),1,WORK,1)
-                     CALL XDAXPY(J-1,WORK(J),A(1,J),1,A(1,K+1),1)
+                     A(J,K+1) = DDOT(J,A(1,J),1,WORK,1)
+                     CALL DAXPY(J-1,WORK(J),A(1,J),1,A(1,K+1),1)
   190             CONTINUE
-                  A(K+1,K+1) = A(K+1,K+1) + XDDOT(KM1,WORK,1,A(1,K+1),1)
-                  A(K,K+1) = A(K,K+1) + XDDOT(KM1,A(1,K),1,A(1,K+1),1)
-                  CALL XDCOPY(KM1,A(1,K),1,WORK,1)
+                  A(K+1,K+1) = A(K+1,K+1) + DDOT(KM1,WORK,1,A(1,K+1),1)
+                  A(K,K+1) = A(K,K+1) + DDOT(KM1,A(1,K),1,A(1,K+1),1)
+                  CALL DCOPY(KM1,A(1,K),1,WORK,1)
                   DO 200 J = 1, KM1
-                     A(J,K) = XDDOT(J,A(1,J),1,WORK,1)
-                     CALL XDAXPY(J-1,WORK(J),A(1,J),1,A(1,K),1)
+                     A(J,K) = DDOT(J,A(1,J),1,WORK,1)
+                     CALL DAXPY(J-1,WORK(J),A(1,J),1,A(1,K),1)
   200             CONTINUE
-                  A(K,K) = A(K,K) + XDDOT(KM1,WORK,1,A(1,K),1)
+                  A(K,K) = A(K,K) + DDOT(KM1,WORK,1,A(1,K),1)
   210          CONTINUE
                KSTEP = 2
   220       CONTINUE
@@ -611,7 +611,7 @@ C           SWAP
 C
             KS = IABS(KPVT(K))
             IF (KS .EQ. K) GO TO 250
-               CALL XDSWAP(KS,A(1,KS),1,A(1,K),1)
+               CALL DSWAP(KS,A(1,KS),1,A(1,K),1)
                DO 230 JB = KS, K
                   J = K + KS - JB
                   TEMP = A(J,K)
@@ -628,242 +628,6 @@ C
          GO TO 150
   260    CONTINUE
   270 CONTINUE
-      RETURN
-      END
-      SUBROUTINE  XDSWAP (N,DX,INCX,DY,INCY)
-C
-C     INTERCHANGES TWO VECTORS.
-C     USES UNROLLED LOOPS FOR INCREMENTS EQUAL ONE.
-C     JACK DONGARRA, LINPACK, 3/11/78.
-C
-      DOUBLE PRECISION DX(1),DY(1),DTEMP
-      INTEGER I,INCX,INCY,IX,IY,M,MP1,N
-C
-      IF(N.LE.0)RETURN
-      IF(INCX.EQ.1.AND.INCY.EQ.1)GO TO 20
-C
-C       CODE FOR UNEQUAL INCREMENTS OR EQUAL INCREMENTS NOT EQUAL
-C         TO 1
-C
-      IX = 1
-      IY = 1
-      IF(INCX.LT.0)IX = (-N+1)*INCX + 1
-      IF(INCY.LT.0)IY = (-N+1)*INCY + 1
-      DO 10 I = 1,N
-        DTEMP = DX(IX)
-        DX(IX) = DY(IY)
-        DY(IY) = DTEMP
-        IX = IX + INCX
-        IY = IY + INCY
-   10 CONTINUE
-      RETURN
-C
-C       CODE FOR BOTH INCREMENTS EQUAL TO 1
-C
-C
-C       CLEAN-UP LOOP
-C
-   20 M = MOD(N,3)
-      IF( M .EQ. 0 ) GO TO 40
-      DO 30 I = 1,M
-        DTEMP = DX(I)
-        DX(I) = DY(I)
-        DY(I) = DTEMP
-   30 CONTINUE
-      IF( N .LT. 3 ) RETURN
-   40 MP1 = M + 1
-      DO 50 I = MP1,N,3
-        DTEMP = DX(I)
-        DX(I) = DY(I)
-        DY(I) = DTEMP
-        DTEMP = DX(I + 1)
-        DX(I + 1) = DY(I + 1)
-        DY(I + 1) = DTEMP
-        DTEMP = DX(I + 2)
-        DX(I + 2) = DY(I + 2)
-        DY(I + 2) = DTEMP
-   50 CONTINUE
-      RETURN
-      END
-      DOUBLE PRECISION FUNCTION XDDOT(N,DX,INCX,DY,INCY)
-C
-C     FORMS THE DOT PRODUCT OF TWO VECTORS.
-C     USES UNROLLED LOOPS FOR INCREMENTS EQUAL TO ONE.
-C     JACK DONGARRA, LINPACK, 3/11/78.
-C
-      DOUBLE PRECISION DX(1),DY(1),DTEMP
-      INTEGER I,INCX,INCY,IX,IY,M,MP1,N
-C
-      XDDOT = 0.0D0
-      DTEMP = 0.0D0
-      IF(N.LE.0)RETURN
-      IF(INCX.EQ.1.AND.INCY.EQ.1)GO TO 20
-C
-C        CODE FOR UNEQUAL INCREMENTS OR EQUAL INCREMENTS
-C          NOT EQUAL TO 1
-C
-      IX = 1
-      IY = 1
-      IF(INCX.LT.0)IX = (-N+1)*INCX + 1
-      IF(INCY.LT.0)IY = (-N+1)*INCY + 1
-      DO 10 I = 1,N
-        DTEMP = DTEMP + DX(IX)*DY(IY)
-        IX = IX + INCX
-        IY = IY + INCY
-   10 CONTINUE
-      XDDOT = DTEMP
-      RETURN
-C
-C        CODE FOR BOTH INCREMENTS EQUAL TO 1
-C
-C
-C        CLEAN-UP LOOP
-C
-   20 M = MOD(N,5)
-      IF( M .EQ. 0 ) GO TO 40
-      DO 30 I = 1,M
-        DTEMP = DTEMP + DX(I)*DY(I)
-   30 CONTINUE
-      IF( N .LT. 5 ) GO TO 60
-   40 MP1 = M + 1
-      DO 50 I = MP1,N,5
-        DTEMP = DTEMP + DX(I)*DY(I) + DX(I + 1)*DY(I + 1) +
-     *   DX(I + 2)*DY(I + 2) + DX(I + 3)*DY(I + 3) + DX(I + 4)*DY(I + 4)
-   50 CONTINUE
-   60 XDDOT = DTEMP
-      RETURN
-      END
-      SUBROUTINE XDAXPY(N,DA,DX,INCX,DY,INCY)
-C
-C     CONSTANT TIMES A VECTOR PLUS A VECTOR.
-C     USES UNROLLED LOOPS FOR INCREMENTS EQUAL TO ONE.
-C     JACK DONGARRA, LINPACK, 3/11/78.
-C
-      DOUBLE PRECISION DX(1),DY(1),DA
-      INTEGER I,INCX,INCY,M,MP1,N,IX,IY
-C
-      IF(N.LE.0)RETURN
-      IF (DA .EQ. 0.0D0) RETURN
-      IF(INCX.EQ.1.AND.INCY.EQ.1)GO TO 20
-C
-C        CODE FOR UNEQUAL INCREMENTS OR EQUAL INCREMENTS
-C          NOT EQUAL TO 1
-C
-      IX = 1
-      IY = 1
-      IF(INCX.LT.0)IX = (-N+1)*INCX + 1
-      IF(INCY.LT.0)IY = (-N+1)*INCY + 1
-      DO 10 I = 1,N
-        DY(IY) = DY(IY) + DA*DX(IX)
-        IX = IX + INCX
-        IY = IY + INCY
-   10 CONTINUE
-      RETURN
-C
-C        CODE FOR BOTH INCREMENTS EQUAL TO 1
-C
-C
-C        CLEAN-UP LOOP
-C
-   20 M = MOD(N,4)
-      IF( M .EQ. 0 ) GO TO 40
-      DO 30 I = 1,M
-        DY(I) = DY(I) + DA*DX(I)
-   30 CONTINUE
-      IF( N .LT. 4 ) RETURN
-   40 MP1 = M + 1
-      DO 50 I = MP1,N,4
-        DY(I) = DY(I) + DA*DX(I)
-        DY(I + 1) = DY(I + 1) + DA*DX(I + 1)
-        DY(I + 2) = DY(I + 2) + DA*DX(I + 2)
-        DY(I + 3) = DY(I + 3) + DA*DX(I + 3)
-   50 CONTINUE
-      RETURN
-      END
-      INTEGER FUNCTION XIDAMAX(N,DX,INCX)
-C
-C     FINDS THE INDEX OF ELEMENT HAVING MAX. ABSOLUTE VALUE.
-C     JACK DONGARRA, LINPACK, 3/11/78.
-C
-      DOUBLE PRECISION DX(1),DMAX
-      INTEGER I,INCX,IX,N
-C
-      XIDAMAX = 0
-      IF( N .LT. 1 ) RETURN
-      XIDAMAX = 1
-      IF(N.EQ.1)RETURN
-      IF(INCX.EQ.1)GO TO 20
-C
-C        CODE FOR INCREMENT NOT EQUAL TO 1
-C
-      IX = 1
-      DMAX = DABS(DX(1))
-      IX = IX + INCX
-      DO 10 I = 2,N
-         IF(DABS(DX(IX)).LE.DMAX) GO TO 5
-         XIDAMAX = I
-         DMAX = DABS(DX(IX))
-    5    IX = IX + INCX
-   10 CONTINUE
-      RETURN
-C
-C        CODE FOR INCREMENT EQUAL TO 1
-C
-   20 DMAX = DABS(DX(1))
-      DO 30 I = 2,N
-         IF(DABS(DX(I)).LE.DMAX) GO TO 30
-         XIDAMAX = I
-         DMAX = DABS(DX(I))
-   30 CONTINUE
-      RETURN
-      END
-      SUBROUTINE  XDCOPY(N,DX,INCX,DY,INCY)
-C
-C     COPIES A VECTOR, X, TO A VECTOR, Y.
-C     USES UNROLLED LOOPS FOR INCREMENTS EQUAL TO ONE.
-C     JACK DONGARRA, LINPACK, 3/11/78.
-C
-      DOUBLE PRECISION DX(1),DY(1)
-      INTEGER I,INCX,INCY,IX,IY,M,MP1,N
-C
-      IF(N.LE.0)RETURN
-      IF(INCX.EQ.1.AND.INCY.EQ.1)GO TO 20
-C
-C        CODE FOR UNEQUAL INCREMENTS OR EQUAL INCREMENTS
-C          NOT EQUAL TO 1
-C
-      IX = 1
-      IY = 1
-      IF(INCX.LT.0)IX = (-N+1)*INCX + 1
-      IF(INCY.LT.0)IY = (-N+1)*INCY + 1
-      DO 10 I = 1,N
-        DY(IY) = DX(IX)
-        IX = IX + INCX
-        IY = IY + INCY
-   10 CONTINUE
-      RETURN
-C
-C        CODE FOR BOTH INCREMENTS EQUAL TO 1
-C
-C
-C        CLEAN-UP LOOP
-C
-   20 M = MOD(N,7)
-      IF( M .EQ. 0 ) GO TO 40
-      DO 30 I = 1,M
-        DY(I) = DX(I)
-   30 CONTINUE
-      IF( N .LT. 7 ) RETURN
-   40 MP1 = M + 1
-      DO 50 I = MP1,N,7
-        DY(I) = DX(I)
-        DY(I + 1) = DX(I + 1)
-        DY(I + 2) = DX(I + 2)
-        DY(I + 3) = DX(I + 3)
-        DY(I + 4) = DX(I + 4)
-        DY(I + 5) = DX(I + 5)
-        DY(I + 6) = DX(I + 6)
-   50 CONTINUE
       RETURN
       END
 
