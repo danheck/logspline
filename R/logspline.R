@@ -1,32 +1,38 @@
-# Copyright (c) 1993 by Charles Kooperberg.                                    *
-# All rights reserved. This function is part of the Logspline Density          *
-# Estimation Program. It was written by Charles Kooperberg at the University   *
-# of Washington and the University of California at Berkeley between 1988 and  *
-# 1991. It is described in the paper: Kooperberg, Charles and Stone, Charles J.*
-# `Logspline density estimation for censored data', Journal of Computational   *
-# and Graphical Statistics, 1 (1992) 301-328.                                  *
-# You are free to use this program, for non-commercial purposes only,          *
-# under two conditions:                                                        *
-# (1) This note is not to be removed                                           *
-# (2) Publications using logspline computations should reference the           *
-#  publication  mentioned above.                                               *
-# For questions, please email clk@stat.washington.edu                          *
-#                       Charles Kooperberg, April 21, 1993                     *
-plogspline <- function(q, fit)
+unstrip <- function(x)
 {
+   dd <- dim(x)
+   y <- x
+   if(length(dd)==2){
+      dd2 <- dd[2]
+      if(dd2==1) y<- c(x[,1])
+      if(dd2==2) y<- cbind(c(x[,1]),c(x[,2]))
+      if(dd2>2) y<- cbind(c(x[,1]),c(x[,2]),c(x[,3]))
+      if(dd2>3)for(i in 4:dd2) y <- cbind(y,c(x[,i]))
+      y
+   }
+   if(length(dd)==1 || length(dd)==0){
+      y <- c(unlist(c(unlist(x))))
+      names(y) <- NULL
+   }
+   y
+}
+   
+poldlogspline <- function(q, fit)
+{
+    if(class(fit)!="oldlogspline")
+       stop("fit is not an oldlogspline object")
+        q <- unstrip(q)
     sq <- rank(q)
     q <- sort(q)
     z <- .C("pqlsd",
-            as.double(fit$coef),
-            as.double(fit$knots),
-            as.double(fit$bound),
-            as.integer(1),
-            pp = as.double(q),
-            as.double(q),
-            as.integer(length(fit$knots)),
-            as.integer(length(q)),
-            PACKAGE="logspline"
-            )
+        as.double(fit$coef),
+        as.double(fit$knots),
+        as.double(fit$bound),
+        as.integer(1),
+        pp = as.double(q),
+        as.double(q),
+        as.integer(length(fit$knots)),
+        as.integer(length(q)))
     zz <- z$pp[sq]
     if(fit$bound[1] > 0)
         zz[q<fit$bound[2]] <- 0
@@ -35,34 +41,42 @@ plogspline <- function(q, fit)
     zz
 }
 
-qlogspline <- function(p, fit)
+qoldlogspline <- function(p, fit)
 {
+    if(class(fit)!="oldlogspline")
+       stop("fit is not an oldlogspline object")
+        p <- unstrip(p)
     sp <- rank(p)
     p <- sort(p)
     z <- .C("pqlsd",
-            as.double(fit$coef),
-            as.double(fit$knots),
-            as.double(fit$bound),
-            as.integer(0),
-            as.double(p),
-            qq = as.double(p),
-            as.integer(length(fit$knots)),
-            as.integer(length(p)),
-            PACKAGE="logspline")
+        as.double(fit$coef),
+        as.double(fit$knots),
+        as.double(fit$bound),
+        as.integer(0),
+        as.double(p),
+        qq = as.double(p),
+        as.integer(length(fit$knots)),
+        as.integer(length(p)))
     zz <- z$qq[sp]
     zz[p<0] <- NA
     zz[p>1] <- NA
     zz
 }
 
-rlogspline <- function(n, fit)
+roldlogspline <- function(n, fit)
 {
+    if(class(fit)!="oldlogspline")
+       stop("fit is not an oldlogspline object")
     pp <- runif(n)
-    qlogspline(pp, fit)
+    qoldlogspline(pp, fit)
 }
 
-dlogspline <- function(x, fit)
+doldlogspline <- function(q, fit)
 {
+    x <- q
+    if(class(fit)!="oldlogspline")
+       stop("fit is not an oldlogspline object")
+        q <- unstrip(q)
     y <- fit$coef[1] + x * fit$coef[2]
     for(i in 1:length(fit$knots)) {
         if(fit$coef[i+2] != 0)
@@ -77,11 +91,14 @@ dlogspline <- function(x, fit)
     y
 }
 
-logspline.plot <- function(fit, n = 100, what = "d", xlim, xlab, ylab, type, ...)
+plot.oldlogspline <- function(x, n = 100, what = "d", xlim, xlab = "", ylab = "", type = "l", ...)
 {
+    fit <- x
+    if(class(fit)!="oldlogspline")
+       stop("fit is not an oldlogspline object")
         if(missing(xlim)) {
-                u1 <- qlogspline(0.01, fit)
-                u2 <- qlogspline(0.99, fit)
+                u1 <- qoldlogspline(0.01, fit)
+                u2 <- qoldlogspline(0.99, fit)
                 u3 <- 1.1 * u1 - 0.1 * u2
                 u4 <- 1.1 * u2 - 0.1 * u1
         }
@@ -91,13 +108,13 @@ logspline.plot <- function(fit, n = 100, what = "d", xlim, xlab, ylab, type, ...
         }
         xx <- (0:(n - 1))/(n - 1) * (u4 - u3) + u3
         if(what == "d" || what == "D")
-                yy <- dlogspline(xx, fit)
+                yy <- doldlogspline(xx, fit)
         if(what == "f" || what == "F" || what == "p" || what == "P")
-                yy <- plogspline(xx, fit)
+                yy <- poldlogspline(xx, fit)
         if(what == "s" || what == "S")
-                yy <- 1 - plogspline(xx, fit)
+                yy <- 1 - poldlogspline(xx, fit)
         if(what == "h" || what == "H")
-                yy <- dlogspline(xx, fit)/(1 - plogspline(xx, fit))
+                yy <- doldlogspline(xx, fit)/(1 - poldlogspline(xx, fit))
         if(missing(xlab))
                 xlab <- ""
         if(missing(ylab))
@@ -106,12 +123,17 @@ logspline.plot <- function(fit, n = 100, what = "d", xlim, xlab, ylab, type, ...
                 type <- "l"
         plot(xx, yy, xlab = xlab, ylab = ylab, type = type, ...)
 }
-
-logspline.summary <- function(fit)
+print.oldlogspline <- function(x,...)
 {
-    if(fit$delete==FALSE)
-        stop(paste("logspline.summary can only provide",
-       "information if delete in logspline.fit is TRUE"))
+   summary.oldlogspline(x)
+}
+summary.oldlogspline <- function(object,...)
+{
+    if(class(object)!="oldlogspline")
+       stop("fit is not an oldlogspline object")
+    fit <- object
+    if(fit$delete==FALSE)stop(paste("summary.oldlogspline can only provide",
+       "information if delete in oldlogspline is TRUE"))
     ul <- fit$penalty
     um <- fit$sample
     ll <- fit$logl
@@ -140,7 +162,7 @@ logspline.summary <- function(fit)
     ww <- rep("", length(bb))
     if(error){
     cat("Warning - imprecision in loglikelihood (possibly due to heavy tails)\n")
-    cat("the output of logspline.summary might not be correct\n")
+    cat("the output of summary.oldlogspline might not be correct\n")
     }
     dimnames(uu) <- list(ww, c("knots", "loglik", "AIC", "minimum penalty",
         "maximum penalty"))
@@ -153,24 +175,28 @@ logspline.summary <- function(fit)
         cat(paste("penalty(AIC) was ", round(ul, 2),", the default (BIC) ",
                 "would have been", round(log(um), 2),"\n"))
     if(min(kk) > 3 && fit$delete==TRUE){
-        cat(paste( "models with fewer than", kk[1],"knots ",
+        cat(paste( "models with fewer than", kk[1],"knots ", 
                   "can be fitted, but they are not optimal for\n"))
         cat(paste("the present choice of penalty - choose penalty in",
-                  "logspline.fit larger\nto see these fits\n"))
+                  "oldlogspline larger\nto see these fits\n"))
     }
     if(min(kk) > 3 && fit$delete==3)
         cat(paste("models with fewer than", kk[1],"knots ",
                     "were not fitted because of convergence problems\n"))
-
+      
     invisible()
 }
 
-logspline.fit <-
-    function(uncensored, right, left, interval, lbound = -Inf, ubound = Inf,
-             nknots, knots, penalty, delete = TRUE)
+oldlogspline <- function(uncensored, right, left, interval, lbound, ubound,
+        nknots, knots, penalty, delete = TRUE)
 {
     nsample <- rep(0, 6)
     # interval is the nterval censored data - a matrix with two columns
+    if(!missing(uncensored))uncensored <- unstrip(uncensored)
+    if(!missing(right))right <- unstrip(right)
+    if(!missing(left))left <- unstrip(left)
+    if(!missing(interval))interval <- unstrip(interval)
+    if(!missing(knots))knots <- unstrip(knots)
     if(!missing(interval)) {
         if(length(interval[1,  ]) != 2)
             stop("interval must have two columns")
@@ -209,7 +235,7 @@ logspline.fit <-
         if(nsample[2]>1)
             nsample[6] <- sum(uncensored[2:nsample[2]] !=
                 uncensored[1:(nsample[2]-1)]) + 1 + nsample[6]
-        else
+        else 
             nsample[6] <- nsample[6]+1
     }
 # we can not run on only right or left censored data
@@ -297,8 +323,7 @@ logspline.fit <-
                 as.double(penalty),
                 as.double(sample),
                 as.double(sample),
-                logl = as.double(rep(0, n1 + 1)),
-                PACKAGE="logspline")
+                logl = as.double(rep(0, n1 + 1)))
         bound <- c(z$bd[2], z$bd[3], z$bd[4], z$bd[5])
         SorC <- z$SorC  # error messages
         if(abs(SorC[1]) > 2) {
@@ -330,7 +355,7 @@ logspline.fit <-
         if(SorC[22] == 1) {
                 cat("possible discontinuity at lower end\n")
                 cat(paste("consider rerunning with lbound=", z$kt[1],
-			"\n"))
+         "\n"))
 
         }
         if(SorC[22] == 3) {
@@ -350,17 +375,276 @@ logspline.fit <-
         if(SorC[23] == 1) {
                 cat("possible discontinuity at upper end\n")
                 cat(paste("consider rerunning with ubound=", z$kt[z$nk],
-			"\n"))
+         "\n"))
 
         }
         if(delete && SorC[28]>0)delete<-3
         coef <- z$cf[1:(z$nk + 2)]
         uu <- 3:z$nk
-        if(delete == FALSE) uu <- 1
-        list(coef = coef, knots = z$kt[1:z$nk], bound = bound, logl = z$logl[
+        if(delete == FALSE)uu <- 1
+        fit <- list(coef = coef, knots = z$kt[1:z$nk], bound = bound, logl = z$logl[
                 uu], penalty = penalty, sample = nsample[1], delete = delete)
+        class(fit) <- "oldlogspline"
+        fit
 }
 
+
+logspline <- function(x, lbound, ubound, maxknots=0, knots, nknots=0,
+   penalty= -1, silent = TRUE,mind= -1)
+{
+   call <- match.call()
+   if(!missing(x))x <- unstrip(x)
+   data <- x
+
+
+   u2 <- length(data)
+   data <- data[!is.na(data)]
+   nsample <- length(data)
+   if(nsample<10)stop("not enough data")
+   if(u2 !=nsample) print(paste("***", u2-nsample, " NAs ignored in data"))
+   data <- sort(data)
+
+   # data can not be beyond the boundaries of the density
+   if(!missing(lbound)) if(data[1] < lbound) stop("data below lbound")
+   if(!missing(ubound)) if(data[nsample] > ubound) stop("data above ubound")
+   mm <- range(data)
+   if(!missing(lbound)) mm <- range(c(mm, lbound))
+   if(!missing(ubound)) mm <- range(c(mm, ubound))
+
+   # boundaries
+   ilow <- (!missing(lbound)) * 1
+   iupp <- (!missing(ubound)) * 1
+   low <- 0
+   upp <- 0
+   if(ilow == 1) low <- lbound
+   if(iupp == 1) upp <- ubound
+
+   # get the maximal dimension
+   intpars <- c(-100, rep(0, 9))
+   z <- .C("nlogcensorx", z = as.integer(intpars))
+   maxp <- z$z[1]
+
+   # organize knots
+   kts <- vector(mode = "double", length = max(maxp))
+   if(maxknots > maxp - 5) warning(paste("maxknots reduced to", maxp))
+   nknots <- -nknots
+   if(!missing(knots)) {
+      nknots <- length(knots)
+      knots <- sort(knots)
+      if(!missing(lbound)) if(min(knots) < lbound)
+         stop("data (knots) below lbound")
+      if(!missing(ubound)) if(max(knots) > ubound)
+         stop("data (knots) above ubound")
+      if(nknots < 3) stop("need at least three starting knots")
+      if(nknots > maxp - 5) stop(paste("at most", maxp - 5, "knots possible"))
+      kts[1:nknots] <- knots
+   }
+
+   silent <- (silent == FALSE)
+
+   # group parameters
+   intpars <- c(nsample, maxknots, nknots, silent, 1-ilow, 1-iupp,mind)
+   dpars <- c(penalty, low, upp)
+   data <- c(data, rep(0, maxp))
+
+   # do it
+   z <- .C("nlogcensor",
+      ip = as.integer(intpars),
+      coef = as.double(data),
+      dp = as.double(dpars),
+      logl = as.double(rep(0, maxp)),
+      ad = as.integer(rep(0, maxp)),
+      kts = as.double(kts))
+
+   # error messages
+   if(z$ip[1] != 0 && z$ip[1]<100) {
+      if(z$ip[1] == 17) stop("too many knots beyond data")
+      if(z$ip[1] == 18) stop("too many knots before data")
+      if(z$ip[1] == 39) stop("too much data close together")
+      if(z$ip[1] == 40) stop("no model could be fitted")
+      if(z$ip[1] == 2) stop("error while solving system")
+      if(z$ip[1] == 8) stop("too much step-halving")
+      if(z$ip[1] == 5) stop("too much step-halving")
+      if(z$ip[1] == 7) 
+         stop("numerical problems, likely tail related. Try lbound/ubound")
+      if(z$ip[1] == 1) stop("no convergence")
+      i <- 0
+      if(missing(knots))i<- 1     
+      if(z$ip[1] == 3 && i==1) 
+        stop("right tail extremely heavy, try running with ubound")
+      if(z$ip[1] == 4 && i==1) 
+        stop("left tail extremely heavy, try running with lbound")
+      if(z$ip[1] == 6 && i==1) 
+        stop("both tails extremely heavy, try running with lbound and ubound")
+      if(z$ip[1] == 3 && i==0) 
+        stop("right tail too heavy or not enough knots in right tail")
+      if(z$ip[1] == 4 && i==0) 
+        stop("left tail too heavy or not enough knots in left tail")
+      if(z$ip[1] == 6 && i==0) 
+        stop("both tails too heavy or not enough knots in both tail")
+   }
+   if(z$ip[1]>100) {
+      warning(" Not all models could be fitted")
+   }
+   # organize logl
+   logl <- cbind(z$ad, z$logl)
+   logl <- cbind(2+(1:z$ip[3]),logl[1+(1:z$ip[3]),  ])
+   kk <- (1:length(logl[,1]))
+   kk <- kk[logl[, 2] == 0 ]
+   if(length(kk)>0)logl <- logl[-kk,]
+   # bye bye
+   fit <- list(call = call, nknots = z$ip[2], coef.pol = z$coef[1:2], coef.kts = 
+      z$coef[2 + (1:z$ip[2])], knots = z$kts[1:z$ip[2]], maxknots = z$ip[3]+2,
+      penalty = z$dp[1], bound = c(ilow, low, iupp, upp), samples = nsample,
+      logl = logl, range = mm, mind = z$ip[7])
+   class(fit) <- "logspline"
+   fit
+}
+plogspline <- function(q, fit)
+{
+    if(class(fit)!="logspline")
+       stop("fit is not a logspline object")
+   if(!missing(q))q <- unstrip(q)
+    sq <- rank(q)
+    q <- sort(q)
+    z <- .C("rpqlsd",
+        as.double(c(fit$coef.pol, fit$coef.kts)),
+        as.double(fit$knots),
+        as.double(fit$bound),
+        as.integer(1),
+        pp = as.double(q),
+        as.integer(length(fit$knots)),
+        as.integer(length(q)))
+    zz <- z$pp[sq]
+    if(fit$bound[1] > 0) zz[q<fit$bound[2]] <- 0
+    if(fit$bound[3] > 0) zz[q>fit$bound[4]] <- 1
+    zz
+}
+qlogspline <- function(p, fit)
+{
+    if(class(fit)!="logspline")
+       stop("fit is not a logspline object")
+   if(!missing(p))p <- unstrip(p)
+    sp <- rank(p)
+    p <- sort(p)
+    z <- .C("rpqlsd",
+        as.double(c(fit$coef.pol, fit$coef.kts)),
+        as.double(fit$knots),
+        as.double(fit$bound),
+        as.integer(0),
+        qq = as.double(p),
+        as.integer(length(fit$knots)),
+        as.integer(length(p)))
+    zz <- z$qq[sp]
+    zz[p<0] <- NA
+    zz[p>1] <- NA
+    zz
+}
+rlogspline <- function(n, fit)
+{
+    if(class(fit)!="logspline")
+       stop("fit is not a logspline object")
+    pp <- runif(n)
+    qlogspline(pp, fit)
+}
+dlogspline <- function(q, fit)
+{
+    if(class(fit)!="logspline")
+       stop("fit is not a logspline object")
+   if(!missing(q))q <- unstrip(q)
+    x <- q
+    y <- fit$coef.pol[1] + x * fit$coef.pol[2]
+    for(i in 1:length(fit$knots)) 
+       y <- y + fit$coef.kts[i] * ((abs(x - fit$knots[i]) +x- fit$knots[i])/2)^3
+    y <- exp(y)
+    if(fit$bound[1] > 0) y[x < fit$bound[2]] <- 0
+    if(fit$bound[3] > 0) y[x > fit$bound[4]] <- 0
+    y
+}
+plot.logspline <-function(x, n = 100, what = "d", add = FALSE, xlim, xlab = "", ylab = "", type = "l", ...)
+{
+        fit <- x
+    if(class(fit)!="logspline")
+       stop("fit is not a logspline object")
+        if(add){
+                plim <- (par()$usr)[1:2]
+                u4 <- plim[1]
+                u3 <- plim[2]
+                if(!missing(xlim)) {
+                        u4 <- max(xlim[1], plim[1])
+                        u3 <- min(xlim[2], plim[2])
+                }
+        }
+        else{
+        if(missing(xlim)) {
+                u1 <- qlogspline(0.01, fit)
+                u2 <- qlogspline(0.99, fit)
+                u3 <- 1.1 * u1 - 0.1 * u2
+                u4 <- 1.1 * u2 - 0.1 * u1
+        }
+        else {
+                u3 <- xlim[1]
+                u4 <- xlim[2]
+        }}
+        xx <- (0:(n - 1))/(n - 1) * (u4 - u3) + u3
+        if(what == "d" || what == "D") yy <- dlogspline(xx, fit)
+        if(what == "f" || what == "F" || what == "p" || what == "P")
+                yy <- plogspline(xx, fit)
+        if(what == "s" || what == "S") yy <- 1 - plogspline(xx, fit)
+        if(what == "h" || what == "H") yy <- dlogspline(xx, fit)/(1 - plogspline(xx, fit))
+        if(missing(xlab)) xlab <- ""
+        if(missing(ylab)) ylab <- ""
+        if(missing(type)) type <- "l"
+        if(add)lines(xx,yy, ...)
+        else plot(xx, yy, xlab = xlab, ylab = ylab, type = type, ...)
+        invisible()
+}
+print.logspline <- function(x,...)
+{
+      summary.logspline(x)
+}
+summary.logspline <- function(object,...)
+{
+        fit <- object
+    if(class(fit)!="logspline")
+       stop("fit is not a logspline object")
+   ul <- fit$penalty
+   um <- fit$samples[1]
+   if(length(fit$samples)>1)
+   um <- fit$samples[1]+ fit$samples[4]
+   else
+   um <- fit$samples
+   kk <- fit$logl[fit$logl[,2] != 0,1]
+   ad <- fit$logl[fit$logl[,2] != 0,2]
+   ll <- fit$logl[fit$logl[,2] != 0,3]
+   bb <- -2 * ll + ul * (kk-1)
+   cc1 <- bb
+   cc2 <- bb
+   cc2[1] <- Inf
+   cc1[length(bb)] <- 0
+   if(length(bb) > 1) {
+      for(i in 1:(length(bb) - 1)) {
+         cc1[i] <- max((ll[(i + 1):(length(bb))] - ll[i])/(kk[(i + 1):
+                (length(bb))] - kk[i]))
+         cc2[i + 1] <- min((ll[1:i] - ll[i + 1])/(kk[1:i] - kk[i + 1]))
+      }
+   }
+   c3 <- cc2 - cc1
+   cc1[c3 < 0] <- NA
+   cc2[c3 < 0] <- NA
+   uu <- cbind(kk, ad, ll, bb, 2 * cc1, 2 * cc2)
+   ww <- rep("", length(bb))
+   dimnames(uu) <- list(ww, c("knots", "A(1)/D(2)", "loglik", "AIC",
+      "minimum penalty", "maximum penalty"))
+   print(round(uu, 2))
+   cat(paste("the present optimal number of knots is ",kk[bb== min(bb)],"\n"))
+   if(ul == log(um))
+      cat(paste("penalty(AIC) was the default: BIC=log(samplesize): log(",
+         um, ")=", round(ul, 2), "\n"))
+   else cat(paste("penalty(AIC) was ", round(ul, 2),
+         ", the default (BIC) ", "would have been", round(log(um), 2), "\n"))
+   invisible()
+}
 .First.lib <- function(lib, pkg)
 {
    library.dynam("logspline", pkg, lib)

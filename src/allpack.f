@@ -1,20 +1,4 @@
-C     Copyright (c) 1993 by Charles Kooperberg.                              
-C     All rights reserved. This function is part of the Logspline Density   
-C     Estimation Program. It was written by Charles Kooperberg at the University
-C     of Washington and the University of California at Berkeley between 1988 
-C     and 1991. It is described in the paper: Kooperberg, Charles and Stone,
-c     Charles, J. `Logspline density estimation for censored data', Journal of
-c     Computational and Graphical Statistics, 1 (1992) 301-328.   
-c     You are free to use this program, for non-commercial purposes only,    
-c     under two conditions:                                                
-c     (1) This note is not to be removed                                  
-c     (2) Publications using logspline computations should reference the
-c      publication  mentioned above.                                   
-c     For questions, please email clk@stat.washington.edu             
-c                       Charles Kooperberg, April 21, 1993           
-c
-c     * at the end of these linpack routines (line 860) follows XSSORT (ssort)
-c     **************************************************************************
+c     /*************************************************************************
 c     * The following subroutines are all part of linpack. Linpack is public   *
 c     * domain software. These routines are only included here for completeness*
 c     * All subroutine-names have been given a leading X - to prevent double   *
@@ -24,8 +8,8 @@ C     JAMES BUNCH, UNIV. CALIF. SAN DIEGO, ARGONNE NAT. LAB.
 c     **************************************************************************
 
       SUBROUTINE XDSIFA(A,LDA,N,KPVT,INFO)
-      INTEGER LDA,N,KPVT(*),INFO
-      DOUBLE PRECISION A(LDA,*)
+      INTEGER LDA,N,KPVT(1),INFO
+      DOUBLE PRECISION A(LDA,1)
 C
 C     XDSIFA FACTORS A DOUBLE PRECISION SYMMETRIC MATRIX BY ELIMINATION
 C     WITH SYMMETRIC PIVOTING.
@@ -247,8 +231,8 @@ C
       RETURN
       END
       SUBROUTINE XDSISL(A,LDA,N,KPVT,B)
-      INTEGER LDA,N,KPVT(*)
-      DOUBLE PRECISION A(LDA,*),B(*)
+      INTEGER LDA,N,KPVT(1)
+      DOUBLE PRECISION A(LDA,1),B(1)
 C
 C     XDSISL SOLVES THE DOUBLE PRECISION SYMMETRIC SYSTEM
 C     A * X = B
@@ -419,9 +403,9 @@ C
       END
       SUBROUTINE XDSIDI(A,LDA,N,KPVT,DET,INERT,WORK,JOB)
       INTEGER LDA,N,JOB
-      DOUBLE PRECISION A(LDA,*),WORK(*)
+      DOUBLE PRECISION A(LDA,1),WORK(1)
       DOUBLE PRECISION DET(2)
-      INTEGER KPVT(*),INERT(3)
+      INTEGER KPVT(1),INERT(3)
 C
 C     XDSIDI COMPUTES THE DETERMINANT, INERTIA AND INVERSE
 C     OF A DOUBLE PRECISION SYMMETRIC MATRIX USING THE FACTORS FROM
@@ -879,3 +863,469 @@ C
   310 X(I) = -X(I)
       RETURN
       END
+
+      SUBROUTINE XDSICO(A,LDA,N,KPVT,RCOND,Z)
+      INTEGER LDA,N,KPVT(*)
+      DOUBLE PRECISION A(LDA,*),Z(*)
+      DOUBLE PRECISION RCOND
+C
+C     DSICO FACTORS A DOUBLE PRECISION SYMMETRIC MATRIX BY ELIMINATION
+C     WITH SYMMETRIC PIVOTING AND ESTIMATES THE CONDITION OF THE
+C     MATRIX.
+C
+C     IF  RCOND  IS NOT NEEDED, DSIFA IS SLIGHTLY FASTER.
+C     TO SOLVE  A*X = B , FOLLOW DSICO BY DSISL.
+C     TO COMPUTE  INVERSE(A)*C , FOLLOW DSICO BY DSISL.
+C     TO COMPUTE  INVERSE(A) , FOLLOW DSICO BY DSIDI.
+C     TO COMPUTE  DETERMINANT(A) , FOLLOW DSICO BY DSIDI.
+C     TO COMPUTE  INERTIA(A), FOLLOW DSICO BY DSIDI.
+C
+C     ON ENTRY
+C
+C        A       DOUBLE PRECISION(LDA, N)
+C                THE SYMMETRIC MATRIX TO BE FACTORED.
+C                ONLY THE DIAGONAL AND UPPER TRIANGLE ARE USED.
+C
+C        LDA     INTEGER
+C                THE LEADING DIMENSION OF THE ARRAY  A .
+C
+C        N       INTEGER
+C                THE ORDER OF THE MATRIX  A .
+C
+C     OUTPUT
+C
+C        A       A BLOCK DIAGONAL MATRIX AND THE MULTIPLIERS WHICH
+C                WERE USED TO OBTAIN IT.
+C                THE FACTORIZATION CAN BE WRITTEN  A = U*D*TRANS(U)
+C                WHERE  U  IS A PRODUCT OF PERMUTATION AND UNIT
+C                UPPER TRIANGULAR MATRICES , TRANS(U) IS THE
+C                TRANSPOSE OF  U , AND  D  IS BLOCK DIAGONAL
+C                WITH 1 BY 1 AND 2 BY 2 BLOCKS.
+C
+C        KPVT    INTEGER(N)
+C                AN INTEGER VECTOR OF PIVOT INDICES.
+C
+C        RCOND   DOUBLE PRECISION
+C                AN ESTIMATE OF THE RECIPROCAL CONDITION OF  A .
+C                FOR THE SYSTEM  A*X = B , RELATIVE PERTURBATIONS
+C                IN  A  AND  B  OF SIZE  EPSILON  MAY CAUSE
+C                RELATIVE PERTURBATIONS IN  X  OF SIZE  EPSILON/RCOND .
+C                IF  RCOND  IS SO SMALL THAT THE LOGICAL EXPRESSION
+C                           1.0 + RCOND .EQ. 1.0
+C                IS TRUE, THEN  A  MAY BE SINGULAR TO WORKING
+C                PRECISION.  IN PARTICULAR,  RCOND  IS ZERO  IF
+C                EXACT SINGULARITY IS DETECTED OR THE ESTIMATE
+C                UNDERFLOWS.
+C
+C        Z       DOUBLE PRECISION(N)
+C                A WORK VECTOR WHOSE CONTENTS ARE USUALLY UNIMPORTANT.
+C                IF  A  IS CLOSE TO A SINGULAR MATRIX, THEN  Z  IS
+C                AN APPROXIMATE NULL VECTOR IN THE SENSE THAT
+C                NORM(A*Z) = RCOND*NORM(A)*NORM(Z) .
+C
+C     LINPACK. THIS VERSION DATED 08/14/78 .
+C     CLEVE MOLER, UNIVERSITY OF NEW MEXICO, ARGONNE NATIONAL LAB.
+C
+C     SUBROUTINES AND FUNCTIONS
+C
+C     LINPACK DSIFA
+C     BLAS DAXPY,DDOT,DSCAL,DASUM
+C     FORTRAN DABS,DMAX1,IABS,DSIGN
+C
+C     INTERNAL VARIABLES
+C
+      DOUBLE PRECISION AK,AKM1,BK,BKM1,DDOT,DENOM,EK,T
+      DOUBLE PRECISION ANORM,S,DASUM,YNORM
+      INTEGER I,INFO,J,JM1,K,KP,KPS,KS
+C
+C
+C     FIND NORM OF A USING ONLY UPPER HALF
+C
+      DO 30 J = 1, N
+         Z(J) = DASUM(J,A(1,J),1)
+         JM1 = J - 1
+         IF (JM1 .LT. 1) GO TO 20
+         DO 10 I = 1, JM1
+            Z(I) = Z(I) + DABS(A(I,J))
+   10    CONTINUE
+   20    CONTINUE
+   30 CONTINUE
+      ANORM = 0.0D0
+      DO 40 J = 1, N
+         ANORM = DMAX1(ANORM,Z(J))
+   40 CONTINUE
+C
+C     FACTOR
+C
+      CALL XDSIFA(A,LDA,N,KPVT,INFO)
+C
+C     RCOND = 1/(NORM(A)*(ESTIMATE OF NORM(INVERSE(A)))) .
+C     ESTIMATE = NORM(Z)/NORM(Y) WHERE  A*Z = Y  AND  A*Y = E .
+C     THE COMPONENTS OF  E  ARE CHOSEN TO CAUSE MAXIMUM LOCAL
+C     GROWTH IN THE ELEMENTS OF W  WHERE  U*D*W = E .
+C     THE VECTORS ARE FREQUENTLY RESCALED TO AVOID OVERFLOW.
+C
+C     SOLVE U*D*W = E
+C
+      EK = 1.0D0
+      DO 50 J = 1, N
+         Z(J) = 0.0D0
+   50 CONTINUE
+      K = N
+   60 IF (K .EQ. 0) GO TO 120
+         KS = 1
+         IF (KPVT(K) .LT. 0) KS = 2
+         KP = IABS(KPVT(K))
+         KPS = K + 1 - KS
+         IF (KP .EQ. KPS) GO TO 70
+            T = Z(KPS)
+            Z(KPS) = Z(KP)
+            Z(KP) = T
+   70    CONTINUE
+C        IF (Z(K) .NE. 0.0D0) EK = DSIGN(EK,Z(K))
+         IF (Z(K) * EK .LT.0.0D0) EK = - EK
+         Z(K) = Z(K) + EK
+         CALL DAXPY(K-KS,Z(K),A(1,K),1,Z(1),1)
+         IF (KS .EQ. 1) GO TO 80
+C           IF (Z(K-1) .NE. 0.0D0) EK = DSIGN(EK,Z(K-1))
+            IF (Z(K-1) * EK .LT.0.0D0) EK = - EK
+            Z(K-1) = Z(K-1) + EK
+            CALL DAXPY(K-KS,Z(K-1),A(1,K-1),1,Z(1),1)
+   80    CONTINUE
+         IF (KS .EQ. 2) GO TO 100
+            IF (DABS(Z(K)) .LE. DABS(A(K,K))) GO TO 90
+               S = DABS(A(K,K))/DABS(Z(K))
+               CALL DSCAL(N,S,Z,1)
+               EK = S*EK
+   90       CONTINUE
+            IF (A(K,K) .NE. 0.0D0) Z(K) = Z(K)/A(K,K)
+            IF (A(K,K) .EQ. 0.0D0) Z(K) = 1.0D0
+         GO TO 110
+  100    CONTINUE
+            AK = A(K,K)/A(K-1,K)
+            AKM1 = A(K-1,K-1)/A(K-1,K)
+            BK = Z(K)/A(K-1,K)
+            BKM1 = Z(K-1)/A(K-1,K)
+            DENOM = AK*AKM1 - 1.0D0
+            Z(K) = (AKM1*BK - BKM1)/DENOM
+            Z(K-1) = (AK*BKM1 - BK)/DENOM
+  110    CONTINUE
+         K = K - KS
+      GO TO 60
+  120 CONTINUE
+      S = 1.0D0/DASUM(N,Z,1)
+      CALL DSCAL(N,S,Z,1)
+C
+C     SOLVE TRANS(U)*Y = W
+C
+      K = 1
+  130 IF (K .GT. N) GO TO 160
+         KS = 1
+         IF (KPVT(K) .LT. 0) KS = 2
+         IF (K .EQ. 1) GO TO 150
+            Z(K) = Z(K) + DDOT(K-1,A(1,K),1,Z(1),1)
+            IF (KS .EQ. 2)
+     *         Z(K+1) = Z(K+1) + DDOT(K-1,A(1,K+1),1,Z(1),1)
+            KP = IABS(KPVT(K))
+            IF (KP .EQ. K) GO TO 140
+               T = Z(K)
+               Z(K) = Z(KP)
+               Z(KP) = T
+  140       CONTINUE
+  150    CONTINUE
+         K = K + KS
+      GO TO 130
+  160 CONTINUE
+      S = 1.0D0/DASUM(N,Z,1)
+      CALL DSCAL(N,S,Z,1)
+C
+      YNORM = 1.0D0
+C
+C     SOLVE U*D*V = Y
+C
+      K = N
+  170 IF (K .EQ. 0) GO TO 230
+         KS = 1
+         IF (KPVT(K) .LT. 0) KS = 2
+         IF (K .EQ. KS) GO TO 190
+            KP = IABS(KPVT(K))
+            KPS = K + 1 - KS
+            IF (KP .EQ. KPS) GO TO 180
+               T = Z(KPS)
+               Z(KPS) = Z(KP)
+               Z(KP) = T
+  180       CONTINUE
+            CALL DAXPY(K-KS,Z(K),A(1,K),1,Z(1),1)
+            IF (KS .EQ. 2) CALL DAXPY(K-KS,Z(K-1),A(1,K-1),1,Z(1),1)
+  190    CONTINUE
+         IF (KS .EQ. 2) GO TO 210
+            IF (DABS(Z(K)) .LE. DABS(A(K,K))) GO TO 200
+               S = DABS(A(K,K))/DABS(Z(K))
+               CALL DSCAL(N,S,Z,1)
+               YNORM = S*YNORM
+  200       CONTINUE
+            IF (A(K,K) .NE. 0.0D0) Z(K) = Z(K)/A(K,K)
+            IF (A(K,K) .EQ. 0.0D0) Z(K) = 1.0D0
+         GO TO 220
+  210    CONTINUE
+            AK = A(K,K)/A(K-1,K)
+            AKM1 = A(K-1,K-1)/A(K-1,K)
+            BK = Z(K)/A(K-1,K)
+            BKM1 = Z(K-1)/A(K-1,K)
+            DENOM = AK*AKM1 - 1.0D0
+            Z(K) = (AKM1*BK - BKM1)/DENOM
+            Z(K-1) = (AK*BKM1 - BK)/DENOM
+  220    CONTINUE
+         K = K - KS
+      GO TO 170
+  230 CONTINUE
+      S = 1.0D0/DASUM(N,Z,1)
+      CALL DSCAL(N,S,Z,1)
+      YNORM = S*YNORM
+C
+C     SOLVE TRANS(U)*Z = V
+C
+      K = 1
+  240 IF (K .GT. N) GO TO 270
+         KS = 1
+         IF (KPVT(K) .LT. 0) KS = 2
+         IF (K .EQ. 1) GO TO 260
+            Z(K) = Z(K) + DDOT(K-1,A(1,K),1,Z(1),1)
+            IF (KS .EQ. 2)
+     *         Z(K+1) = Z(K+1) + DDOT(K-1,A(1,K+1),1,Z(1),1)
+            KP = IABS(KPVT(K))
+            IF (KP .EQ. K) GO TO 250
+               T = Z(K)
+               Z(K) = Z(KP)
+               Z(KP) = T
+  250       CONTINUE
+  260    CONTINUE
+         K = K + KS
+      GO TO 240
+  270 CONTINUE
+C     MAKE ZNORM = 1.0
+      S = 1.0D0/DASUM(N,Z,1)
+      CALL DSCAL(N,S,Z,1)
+      YNORM = S*YNORM
+C
+      IF (ANORM .NE. 0.0D0) RCOND = YNORM/ANORM
+      IF (ANORM .EQ. 0.0D0) RCOND = 0.0D0
+      RETURN
+      END
+      SUBROUTINE XDGEFA(A,LDA,N,IPVT,INFO)
+      INTEGER LDA,N,IPVT(*),INFO
+      DOUBLE PRECISION A(LDA,*)
+      DOUBLE PRECISION T
+      INTEGER IDAMAX,J,K,KP1,L,NM1
+      INFO = 0
+      NM1 = N - 1
+      IF (NM1 .LT. 1) GO TO 70
+      DO 60 K = 1, NM1
+         KP1 = K + 1
+         L = IDAMAX(N-K+1,A(K,K),1) + K - 1
+         IPVT(K) = L
+         IF (A(L,K) .EQ. 0.0D0) GO TO 40
+            IF (L .EQ. K) GO TO 10
+               T = A(L,K)
+               A(L,K) = A(K,K)
+               A(K,K) = T
+   10       CONTINUE
+            T = -1.0D0/A(K,K)
+            CALL DSCAL(N-K,T,A(K+1,K),1)
+            DO 30 J = KP1, N
+               T = A(L,J)
+               IF (L .EQ. K) GO TO 20
+                  A(L,J) = A(K,J)
+                  A(K,J) = T
+   20          CONTINUE
+               CALL DAXPY(N-K,T,A(K+1,K),1,A(K+1,J),1)
+   30       CONTINUE
+         GO TO 50
+   40    CONTINUE
+            INFO = K
+   50    CONTINUE
+   60 CONTINUE
+   70 CONTINUE
+      IPVT(N) = N
+      IF (A(N,N) .EQ. 0.0D0) INFO = N
+      RETURN
+      END
+      SUBROUTINE XDGEDI(A,LDA,N,IPVT,DET,WORK,JOB)
+      INTEGER LDA,N,IPVT(*),JOB
+      DOUBLE PRECISION A(LDA,*),DET(2),WORK(*)
+      DOUBLE PRECISION T
+      DOUBLE PRECISION TEN
+      INTEGER I,J,K,KB,KP1,L,NM1
+      IF (JOB/10 .EQ. 0) GO TO 70
+         DET(1) = 1.0D0
+         DET(2) = 0.0D0
+         TEN = 10.0D0
+         DO 50 I = 1, N
+            IF (IPVT(I) .NE. I) DET(1) = -DET(1)
+            DET(1) = A(I,I)*DET(1)
+            IF (DET(1) .EQ. 0.0D0) GO TO 60
+   10       IF (DABS(DET(1)) .GE. 1.0D0) GO TO 20
+               DET(1) = TEN*DET(1)
+               DET(2) = DET(2) - 1.0D0
+            GO TO 10
+   20       CONTINUE
+   30       IF (DABS(DET(1)) .LT. TEN) GO TO 40
+               DET(1) = DET(1)/TEN
+               DET(2) = DET(2) + 1.0D0
+            GO TO 30
+   40       CONTINUE
+   50    CONTINUE
+   60    CONTINUE
+   70 CONTINUE
+      IF (MOD(JOB,10) .EQ. 0) GO TO 150
+         DO 100 K = 1, N
+            A(K,K) = 1.0D0/A(K,K)
+            T = -A(K,K)
+            CALL DSCAL(K-1,T,A(1,K),1)
+            KP1 = K + 1
+            IF (N .LT. KP1) GO TO 90
+            DO 80 J = KP1, N
+               T = A(K,J)
+               A(K,J) = 0.0D0
+               CALL DAXPY(K,T,A(1,K),1,A(1,J),1)
+   80       CONTINUE
+   90       CONTINUE
+  100    CONTINUE
+         NM1 = N - 1
+         IF (NM1 .LT. 1) GO TO 140
+         DO 130 KB = 1, NM1
+            K = N - KB
+            KP1 = K + 1
+            DO 110 I = KP1, N
+               WORK(I) = A(I,K)
+               A(I,K) = 0.0D0
+  110       CONTINUE
+            DO 120 J = KP1, N
+               T = WORK(J)
+               CALL DAXPY(N,T,A(1,J),1,A(1,K),1)
+  120       CONTINUE
+            L = IPVT(K)
+            IF (L .NE. K) CALL DSWAP(N,A(1,K),1,A(1,L),1)
+  130    CONTINUE
+  140    CONTINUE
+  150 CONTINUE
+      RETURN
+      END
+      SUBROUTINE XDGESL(A,LDA,N,IPVT,B,JOB)
+      INTEGER LDA,N,IPVT(*),JOB
+      DOUBLE PRECISION A(LDA,*),B(*)
+C
+C     DGESL SOLVES THE DOUBLE PRECISION SYSTEM
+C     A * X = B  OR  TRANS(A) * X = B
+C     USING THE FACTORS COMPUTED BY DGECO OR DGEFA.
+C
+C     ON ENTRY
+C
+C        A       DOUBLE PRECISION(LDA, N)
+C                THE OUTPUT FROM DGECO OR DGEFA.
+C
+C        LDA     INTEGER
+C                THE LEADING DIMENSION OF THE ARRAY  A .
+C
+C        N       INTEGER
+C                THE ORDER OF THE MATRIX  A .
+C
+C        IPVT    INTEGER(N)
+C                THE PIVOT VECTOR FROM DGECO OR DGEFA.
+C
+C        B       DOUBLE PRECISION(N)
+C                THE RIGHT HAND SIDE VECTOR.
+C
+C        JOB     INTEGER
+C                = 0         TO SOLVE  A*X = B ,
+C                = NONZERO   TO SOLVE  TRANS(A)*X = B  WHERE
+C                            TRANS(A)  IS THE TRANSPOSE.
+C
+C     ON RETURN
+C
+C        B       THE SOLUTION VECTOR  X .
+C
+C     ERROR CONDITION
+C
+C        A DIVISION BY ZERO WILL OCCUR IF THE INPUT FACTOR CONTAINS A
+C        ZERO ON THE DIAGONAL.  TECHNICALLY THIS INDICATES SINGULARITY
+C        BUT IT IS OFTEN CAUSED BY IMPROPER ARGUMENTS OR IMPROPER
+C        SETTING OF LDA .  IT WILL NOT OCCUR IF THE SUBROUTINES ARE
+C        CALLED CORRECTLY AND IF DGECO HAS SET RCOND .GT. 0.0
+C        OR DGEFA HAS SET INFO .EQ. 0 .
+C
+C     TO COMPUTE  INVERSE(A) * C  WHERE  C  IS A MATRIX
+C     WITH  P  COLUMNS
+C           CALL DGECO(A,LDA,N,IPVT,RCOND,Z)
+C           IF (RCOND IS TOO SMALL) GO TO ...
+C           DO 10 J = 1, P
+C              CALL DGESL(A,LDA,N,IPVT,C(1,J),0)
+C        10 CONTINUE
+C
+C     LINPACK. THIS VERSION DATED 08/14/78 .
+C     CLEVE MOLER, UNIVERSITY OF NEW MEXICO, ARGONNE NATIONAL LAB.
+C
+C     SUBROUTINES AND FUNCTIONS
+C
+C     BLAS DAXPY,DDOT
+
+C     INTERNAL VARIABLES
+C
+      DOUBLE PRECISION DDOT,T
+      INTEGER K,KB,L,NM1
+C
+      NM1 = N - 1
+      IF (JOB .NE. 0) GO TO 50
+C
+C        JOB = 0 , SOLVE  A * X = B
+C        FIRST SOLVE  L*Y = B
+C
+         IF (NM1 .LT. 1) GO TO 30
+         DO 20 K = 1, NM1
+            L = IPVT(K)
+            T = B(L)
+            IF (L .EQ. K) GO TO 10
+               B(L) = B(K)
+               B(K) = T
+   10       CONTINUE
+            CALL DAXPY(N-K,T,A(K+1,K),1,B(K+1),1)
+   20    CONTINUE
+   30    CONTINUE
+C
+C        NOW SOLVE  U*X = Y
+C
+         DO 40 KB = 1, N
+            K = N + 1 - KB
+            B(K) = B(K)/A(K,K)
+            T = -B(K)
+            CALL DAXPY(K-1,T,A(1,K),1,B(1),1)
+   40    CONTINUE
+      GO TO 100
+   50 CONTINUE
+C
+C        JOB = NONZERO, SOLVE  TRANS(A) * X = B
+C        FIRST SOLVE  TRANS(U)*Y = B
+C
+         DO 60 K = 1, N
+            T = DDOT(K-1,A(1,K),1,B(1),1)
+            B(K) = (B(K) - T)/A(K,K)
+   60    CONTINUE
+C
+C        NOW SOLVE TRANS(L)*X = Y
+C
+         IF (NM1 .LT. 1) GO TO 90
+         DO 80 KB = 1, NM1
+            K = N - KB
+            B(K) = B(K) + DDOT(N-K,A(K+1,K),1,B(K+1),1)
+            L = IPVT(K)
+            IF (L .EQ. K) GO TO 70
+               T = B(L)
+               B(L) = B(K)
+               B(K) = T
+   70       CONTINUE
+   80    CONTINUE
+   90    CONTINUE
+  100 CONTINUE
+      RETURN
+      END
+

@@ -1,9 +1,12 @@
 Package: logspline
-Version: 1.0-8
-Date: 2003-11-05
-Author: S original by Charles L. Kooperberg.
-  R port by  Brian Ripley <ripley@stats.ox.ac.uk>.
-Maintainer: Brian Ripley <ripley@stats.ox.ac.uk>
-Description: Logspline density estimation.
-Title: Logspline density estimation
-License: You are free to use this program, for non-commercial purposes only.
+Version: 2.0.0
+Date: 2004-02-03
+Title: Logspline density estimation routines
+Author: Charles Kooperberg <clk@fhcrc.org>
+Maintainer: Charles Kooperberg <clk@fhcrc.org>
+Depends: R
+Description: Routines for the logspline density estimation. oldlogspline
+  uses the same algorithm as the logspline 1.0.x package - the Kooperberg
+  and Stone (1992) algorithm (with an improved interface). The recomended
+  routine logspline uses an algorithm from Stone et al (1997). 
+License: GPL version 2 or newer
