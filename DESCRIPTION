@@ -1,6 +1,6 @@
 Package: logspline
-Version: 2.1.1
-Date: 2008-11-18
+Version: 2.1.2
+Date: 2009-01-26
 Title: Logspline density estimation routines
 Author: Charles Kooperberg <clk@fhcrc.org>
 Maintainer: Charles Kooperberg <clk@fhcrc.org>
