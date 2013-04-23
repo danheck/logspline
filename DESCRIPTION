@@ -1,6 +1,6 @@
 Package: logspline
-Version: 2.1.4
-Date: 2012-08-15
+Version: 2.1.5
+Date: 2013-04-23
 Title: Logspline density estimation routines
 Author: Charles Kooperberg <clk@fhcrc.org>
 Maintainer: Charles Kooperberg <clk@fhcrc.org>
@@ -10,6 +10,7 @@ Description: Routines for the logspline density estimation.
         improved interface). The recommended routine logspline uses an
         algorithm from Stone et al (1997).
 License: GPL (>= 2)
-Packaged: 2012-08-15 20:29:18 UTC; clk
+Packaged: 2013-04-24 15:55:03 UTC; clk
+NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2012-08-16 16:17:41
+Date/Publication: 2013-04-24 18:10:07

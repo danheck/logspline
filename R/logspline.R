@@ -118,7 +118,7 @@ doldlogspline <- function(q, fit)
     y
 }
 
-plot.oldlogspline <- function(x, n = 100, what = "d", xlim, xlab = "", ylab = "", type = "l", ...)
+plot.oldlogspline <- function(x, n = 100, what = "d", xlim, xlab = "", ylab = "", type = "l", add = FALSE, ...)
 {
     fit <- x
     if(class(fit)!="oldlogspline")
@@ -148,7 +148,8 @@ plot.oldlogspline <- function(x, n = 100, what = "d", xlim, xlab = "", ylab = ""
                 ylab <- ""
         if(missing(type))
                 type <- "l"
-        plot(xx, yy, xlab = xlab, ylab = ylab, type = type, ...)
+        if(add==FALSE)plot(xx, yy, xlab = xlab, ylab = ylab, type = type, ...)
+        else lines(xx,yy, type = type, ...)
 }
 print.oldlogspline <- function(x,...)
 {
@@ -694,8 +695,4 @@ summary.logspline <- function(object,...)
    else cat(paste("penalty(AIC) was ", round(ul, 2),
          ", the default (BIC) ", "would have been", round(log(um), 2), "\n"))
    invisible()
-}
-.First.lib <- function(lib, pkg)
-{
-   library.dynam("logspline", pkg, lib)
 }
