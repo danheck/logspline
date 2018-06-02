@@ -1,5 +1,5 @@
 #
-# Copyright [1993-2016] [Charles Kooperberg]
+# Copyright [1993-2018] [Charles Kooperberg]
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -353,6 +353,7 @@ oldlogspline <- function(uncensored, right, left, interval, lbound, ubound,
         SorC <- vector(mode = "integer", length = 35)
         SorC[1] <- 1    # the actual function call
         nsample[6] <- nsample[6]-1
+        if(length(table(sample))<3)stop("Not enough unique values")
         z <- .C("logcensor",
                 as.integer(delete),
                 as.integer(iautoknot),
@@ -438,6 +439,7 @@ logspline <- function(x, lbound, ubound, maxknots=0, knots, nknots=0,
    call <- match.call()
    if(!missing(x))x <- unstrip(x)
    data <- x
+   if(length(table(data))<3)stop("Not enough unique values")
    ilx <- 0; iux <- 0
    if(!missing(lbound)){ilx <- 1;jlx <- lbound}
    if(!missing(ubound)){iux <- 1;jux <- ubound}

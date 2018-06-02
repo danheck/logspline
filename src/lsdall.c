@@ -1,6 +1,6 @@
 /*
 *
-* Copyright [1993-2016] [Charles Kooperberg]
+* Copyright [1993-2018] [Charles Kooperberg]
 *
 *   Licensed under the Apache License, Version 2.0 (the "License");
 *   you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ static double pqexp(),pqnum(),lpqexpi(),pqdens();
 /* this is the main program                                                   */
 /* remove follows at the end                                                  */
 
-int logcensor(idelete,iknotauto,sample,nsample,bound,
+void logcensor(idelete,iknotauto,sample,nsample,bound,
               SorC,ynknots,yknots,ycoef,alpha,wk,wk2,logl)
 
 int *idelete,*iknotauto,nsample[],SorC[],*ynknots;
@@ -73,11 +73,10 @@ double aic,aicmin,r1,rknots[NC],xcoef2[NC][NC];
    alpha - alpha value in aic               
    rknots - copy of knots                                                     */
 
-int i,j,nkstart,iremove=0,iknots2[NC],iknots[NC],xiknots[NC];
+int i,j,nkstart,iremove=0,iknots[NC],xiknots[NC];
 /* local integers
    i,j,k - counter, utility                                                   
    nkstart - number of knots at the beginning of the algorithm
-   iknots2 - copy of iknots
    iremove - number of the knot that is removed                               */
 
 
@@ -96,7 +95,7 @@ int i,j,nkstart,iremove=0,iknots2[NC],iknots[NC],xiknots[NC];
          (void)Rprintf("sample is too small\n");
       else
          SorC[0] = 2;
-      return 0;
+      return;
    }
 
 /* determine the number of starting knots                                     */
@@ -129,9 +128,9 @@ int i,j,nkstart,iremove=0,iknots2[NC],iknots[NC],xiknots[NC];
    for(i=0;i<nknots;i++)yknots[i]=knots[i];
 
 /* some possible errors                                                       */
-   if(SorC[0] == -2)return 0;
-   if(SorC[0] == 647)return 0;
-   if(SorC[0] == 23)return 0;
+   if(SorC[0] == -2)return;
+   if(SorC[0] == 647)return;
+   if(SorC[0] == 23)return;
 
 /* Compute stuff later used for computing sufficient statistics.              */
    suffstat1(suffcombine,sample,nsample);
@@ -172,7 +171,7 @@ int i,j,nkstart,iremove=0,iknots2[NC],iknots[NC],xiknots[NC];
          if(nknots==nkstart){
              SorC[0] = -1;
              SorC[27]=0;
-             return 0;
+             return;
          }
          if(SorC[0]==-647)
             (void)Rprintf("Smallest number of knots tried is %d\n",nknots+1);
@@ -201,22 +200,19 @@ int i,j,nkstart,iremove=0,iknots2[NC],iknots[NC],xiknots[NC];
          logl[nknots-1]=loglikelihood*nsample[0]+log(qt[1])*nsample[1]; /* &&&&& */
          if(aic <= aicmin){
 
-/* Then we mark the solution iknots2 is put to 0, so we can fill it later     */
+/* Then we mark the solution   */
             aicmin = aic;
             xczheta = czheta;
             xnknots = nknots;
             for(i=0; i<NC; i++){
                xzheta[i] = zheta[i];
                xiknots[i] = iknots[i];
-               iknots2[i] = 0;
                for(j=0;j<NC;j++)
                   xcoef2[i][j]=coef2[i][j];
             }
 
 /* that is we fill it here, iknots contains the rank numbers of the remaining
    knots                                                                      */
-            for(i=0;i<nknots;i++)
-               iknots2[iknots[i]] = 1;
          }
          else{
             r1 = -2. * loglikelihood * nsample[0] + *alpha * 2;
@@ -270,7 +266,7 @@ int i,j,nkstart,iremove=0,iknots2[NC],iknots[NC],xiknots[NC];
    ycoef[0]=ycoef[0]+ycoef[1]*qt[0]+log(qt[1]);
    ycoef[1]=ycoef[1]*qt[1];
    
-   return nkstart;
+   return;
 }
 /******************************************************************************/
 
@@ -891,7 +887,6 @@ double candidate[],sample[],bound[];
 int nsample[],accuracy;
 {
    double r0,r1,likl,r3[NC+1],aa[6],bb[6];
-   double rtt;
    int i1,i2,i3,i4,iv,iw;
    r0=exp((double)(-740));
 
@@ -955,7 +950,6 @@ int nsample[],accuracy;
       }
 /* the right censored data                                                    */
       for(i1=0;i1<nsample[3];i1++){
-         rtt=likl;
          i2=i1+nsample[1]+2*nsample[2];
 /* in which interval is the datapoint                                         */
          for(i3=0;knots[i3]<sample[i2] && i3 < nknots;i3++);
@@ -1888,7 +1882,7 @@ double rknots[],sample[],bound[],smp2[],smp3[],qt[];
 /* these quantities are defined in lhead.h and the files where they originate */
 
 {
-   int i,j=0,j2,k,kk,ll,ia=0,il;
+   int i,j=0,j2,k,kk,ll,ia=0,il,kx;
 /* local integers
    i k     - counters
    j j2    - is there an odd or an even number of knots?                      */
@@ -2075,7 +2069,8 @@ double rknots[],sample[],bound[],smp2[],smp3[],qt[];
             k = 0;
             for(i=1;i<nknots-1;i++){
                rknots[i]=(rknots[i]-0.5);
-               for(k=k;k<=il;k++){
+               kx=k;
+               for(k=kx;k<=il;k++){
                   if(smp3[k]>=rknots[i]){
                      knots[i]=((rknots[i]-smp3[k-1])*smp2[k]+
                              (smp3[k]-rknots[i])*smp2[k-1])/(smp3[k]-smp3[k-1]);
@@ -2889,6 +2884,8 @@ int *ipq,*lk,*lp;
 {
    double v1[2],v2[2];
    int ij;
+   v2[0]=0;
+   v2[1]=0;
    if((*ipq)==1)
       qtop(coef,knots,bound,pp,qq,*lp,*lk);
    else{
@@ -2907,6 +2904,7 @@ int lp,lk;
 {
    double l0,l1,r0,r1, s1,s2,s3,s4,x1,x2,x3,sj,xj;
    int i,j,vr,vl,k;
+   j=0;
    l0 = coef[0];
    l1 = coef[1];
    r0 = l0;

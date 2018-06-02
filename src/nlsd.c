@@ -1,6 +1,6 @@
 /*
 *
-* Copyright [1993-2016] [Charles Kooperberg]
+* Copyright [1993-2018] [Charles Kooperberg]
 *
 *   Licensed under the Apache License, Version 2.0 (the "License");
 *   you may not use this file except in compliance with the License.
@@ -1720,6 +1720,7 @@ struct datastruct *data;
    double a,b;
    struct basisfunct *bn;
 /* no deep meanings */
+   m=0;
 /* get (*spc).basis.c3 */
    for(i=0;i<(*spc).ndim;i++){
       bn=&((*spc).basis[i]);
@@ -2055,7 +2056,7 @@ int *ipq,*lk,*lp;
 {
    double *kpl,**cpl,*ppl,*pqx,r;
    double *zz,cor;
-   int i,j,nk,fst,lst;
+   int i,j,nk,fst,lst,jx;
    /* Gaussian quadrature coefficients */
    ww6[1 ]= 0.467913934572691; yy6[1 ]= 0.238619186083197;
    ww6[2 ]= 0.360761573048139; yy6[2 ]= 0.661209386466265;
@@ -2197,7 +2198,8 @@ int *ipq,*lk,*lp;
 /* before the first knot */
    fst=j;
    lst=j-1;
-   for(j=j;j<(*lp) && pq[j]<=zz[1];j++) lst=j;
+   jx=j;
+   for(j=jx;j<(*lp) && pq[j]<=zz[1];j++) lst=j;
    if(lst>=fst){
       if((*ipq)==0) getq0(pq,pqx,fst,lst,cpl[0],kpl[0],bnd[0],cor);
       else getp0(pq,pqx,fst,lst,cpl[0],kpl[0],bnd[0],cor);
@@ -2206,7 +2208,8 @@ int *ipq,*lk,*lp;
    for(i=1;i<nk-1;i++){
       fst=j;
       lst=j-1;
-      for(j=j;j<(*lp) && pq[j]<=zz[i+1];j++) lst=j;
+      jx=j;
+      for(j=jx;j<(*lp) && pq[j]<=zz[i+1];j++) lst=j;
       if(lst>=fst){
          if((*ipq)==0)
             getq1(pq,pqx,fst,lst,cpl[i],kpl[i],kpl[i+1],ppl[i],ppl[i+1]);
@@ -2216,13 +2219,15 @@ int *ipq,*lk,*lp;
 /* beyond the larst knot */
    fst=j;
    lst=j-1;
-   for(j=j;j<(*lp) && pq[j]<zz[nk];j++) lst=j;
+   jx=j;
+   for(j=jx;j<(*lp) && pq[j]<zz[nk];j++) lst=j;
    if(lst>=fst){
       if((*ipq)==0) getq2(pq,pqx,fst,lst,cpl[nk-1],kpl[nk],bnd[2],cor);
       else getp2(pq,pqx,fst,lst,cpl[nk-1],kpl[nk],bnd[2],cor);
    }
 /* outside the range */
-   for(j=j;j<(*lp);j++){
+   jx=j;
+   for(j=jx;j<(*lp);j++){
       if((*ipq)==0){
          if(bnd[2]>0.5)pqx[j]=kpl[nk];
          else pqx[j]= 1.0e100;
@@ -2295,6 +2300,8 @@ int f,l;
    for(i=1;i<=50;i++)y[i]=y[i-1]+r*(f1[2*(i-1)]+4*f1[2*i-1]+f1[2*i])/3.;
    s=(p1-p0)/y[50];
    for(i=0;i<=50;i++)y[i]=p0+y[i]*s;
+   y[0]=p0;
+   y[50]=p1;
    i=0;
    s=2.*r;
    for(j=f;j<=l;j++){
@@ -2303,7 +2310,7 @@ int f,l;
          if(p[j]>=y[i] && p[j]<=y[i+1]) q[j]=k0+s*i+s*(p[j]-y[i])/(y[i+1]-y[i]);
          else i++;
       }
-      while (q[j]<k0);
+      while ((q[j]<k0)&(i<50));
    }
 }
 /******************************************************************************/

@@ -1,6 +1,6 @@
 # Remove the previous line if you edit this file
 
-useDynLib(logspline)
+useDynLib(logspline, .registration = TRUE)
 
 # Export all names
 exportPattern(".")
