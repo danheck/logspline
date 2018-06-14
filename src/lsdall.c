@@ -35,7 +35,7 @@ static void coeff() ,start1() ,start2() ,suffstat1() ,suffstat2() ,knotplace();
 static double dens3(),numint(),expin(),dens33(),onesearch();
 static double fun2(),tails(),fun48(),numints(),expin2();
 static void intnum2(),intnum3(),intnum4();
-static void qtop(),ptoq();
+static void qtop(),qtop1(),ptoq();
 static double pqexp(),pqnum(),lpqexpi(),pqdens();
 /******************************************************************************/
 /* this is the main program                                                   */
@@ -141,7 +141,7 @@ int i,j,nkstart,iremove=0,iknots[NC],xiknots[NC];
 /* Compute coefficient matrix.                                                */
    itrouble = 0;
    do{   
-      coeff(coef2);
+      coeff(coef2); 
 
 /* Compute sufficient statistics.                                             */
       suffstat2(suffcombine,coef2,sufficient);
@@ -1542,7 +1542,7 @@ double coef2[][NC];
    coef2[nknots-2][nknots]   = (knots[nknots-3] - knots[nknots-1]) / 
                                (knots[nknots-1] - knots[nknots-2]);
    coef2[nknots-2][nknots+1] = (knots[nknots-2] - knots[nknots-3]) /
-                               (knots[nknots-1] - knots[nknots-2]);
+                               (knots[nknots-1] - knots[nknots-2]);    
 
 /* we first create basis functions that are 0 before knot[i] and constant
    after knot [i+3]                                                           */
@@ -1582,9 +1582,9 @@ double coef2[][NC];
 
 /* The rest is a bit tricking with the correct indices                        */
    for(i=0; i<nknots-1; i++){
-      for(j=i; j<i+4; j++){
-         if(j > 0 && j < nknots+1 && (i != 0 || j != 3)){
-            for(k=i+1; k<j+2; k++){
+      for(j=i; j<i+4; j++){ 
+         for(k=i+1; k<j+2; k++){ 
+            if(j > 0 && j < nknots+1 && (i != 0 || j != 3)){
                if(k != 1){
                   coef[i][0][j] = coef[i][0][j] - 
                                   coef2[i][k] * pow(knots[k-2], 3.);
@@ -1594,9 +1594,9 @@ double coef2[][NC];
                   coef[i][3][j] = coef[i][3][j] + coef2[i][k];
                }
             }
-         }
-      }
-   }
+         }  
+      }  
+   }    
 }
 /******************************************************************************/
 
@@ -2882,19 +2882,15 @@ void pqlsd(coef,knots,bound,ipq,pp,qq,lk,lp)
 double coef[],knots[],pp[],bound[],qq[];
 int *ipq,*lk,*lp;
 {
-   double v1[2],v2[2];
+   double v1[2],v20;
    int ij;
-   v2[0]=0;
-   v2[1]=0;
    if((*ipq)==1)
       qtop(coef,knots,bound,pp,qq,*lp,*lk);
    else{
-      v2[0]=knots[2];
-      ij=1;
-      qtop(coef,knots,bound,v1,v2,ij,*lk);
-      v2[0]=v2[0];
-      for(ij=0;ij<*lp;ij++)pp[ij]=pp[ij]*v2[0];
-      ptoq(coef,knots,bound,pp,qq,*lp,*lk,v2[0]);
+      v20=knots[2];
+      qtop1(coef,knots,bound,v1,v20,*lk);
+      for(ij=0;ij<*lp;ij++)pp[ij]=pp[ij]*v20;
+      ptoq(coef,knots,bound,pp,qq,*lp,*lk,v20);
    }
 }
 /******************************************************************************/
@@ -2962,6 +2958,32 @@ int lp,lk;
    }
 }
 /******************************************************************************/
+static void qtop1(coef,knots,bound,pp,v2,lk)
+double coef[],knots[],bound[],pp[],v2;
+int lk;
+{
+   double l0,l1,r0,r1,s2;
+   int i,j,k,vr,vl;
+   l0 = coef[0];
+   l1 = coef[1];
+   r0 = l0;
+   r1 = l1;
+   for(i=0;i<lk;i++){
+      r0 = r0 - coef[i+2]*knots[i]*knots[i]*knots[i];
+      r1 = r1 + 3.* coef[i+2]*knots[i]*knots[i];
+   }
+   vr = 4;
+   if(bound[2]<0.5)vr=3;
+   vl = 2;
+   if(bound[0]<0.5)vl=1;
+   s2 = pqexp(vl,knots[0],bound[1],l1,l0);
+   for(j=1;j<lk;j++)
+      s2 = s2 + pqnum(knots[j-1],knots[j],j,knots,coef);
+   s2 = s2+fabs(pqexp(vr,knots[lk-1],bound[3],r1,r0));
+   v2=s2;
+   pp[0]=pp[0]/s2;
+}
+/******************************************************************************/
 static void qtop(coef,knots,bound,pp,qq,lp,lk)
 double coef[],knots[],bound[],pp[],qq[];
 int lp,lk;
@@ -3000,7 +3022,7 @@ int lp,lk;
             pp[i] = s2;
          } 
       }
-      if(k==lk && ko != lk){
+      if(k==lk && ko != lk &&i>0){
          s2 = s2 + pqnum(qq[i-1],knots[ko],ko,knots,coef);
          if(k>ko+1)
                for(j=ko+1;j<k;j++)

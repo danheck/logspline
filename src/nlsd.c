@@ -2180,8 +2180,9 @@ int *ipq,*lk,*lp;
       else ppl[nk]=z1int(kpl[nk-1],cpl[nk-1],-1)+ppl[nk-1];
    }
 /* correction factor */
-   cor=ppl[nk];
+   cor=1.;
 /* correct the density */
+   for(i=0;i<=nk;i++)cpl[i][0]=cpl[i][0]+log(1./ppl[nk]);
    for(i=0;i<=nk;i++)ppl[i]=ppl[i]/ppl[nk];
    j=0;
 /* initialize */
@@ -2216,7 +2217,7 @@ int *ipq,*lk,*lp;
          else getp1(pq,pqx,fst,lst,cpl[i],kpl[i],kpl[i+1],ppl[i],ppl[i+1]);
       }
    }
-/* beyond the larst knot */
+/* beyond the last knot */
    fst=j;
    lst=j-1;
    jx=j;

@@ -585,7 +585,7 @@ plogspline <- function(q, fit)
     zz <- z$pp[sq]
     if(fit$bound[1] > 0) zz[q<fit$bound[2]] <- 0
     if(fit$bound[3] > 0) zz[q>fit$bound[4]] <- 1
-    zz
+    zz 
 }
 qlogspline <- function(p, fit)
 {
