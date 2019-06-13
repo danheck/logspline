@@ -9,14 +9,12 @@
 extern void logcensor(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
 extern void nlogcensor(void *, void *, void *, void *, void *, void *);
 extern void nlogcensorx(void *);
-extern void pqlsd(void *, void *, void *, void *, void *, void *, void *, void *);
 extern void rpqlsd(void *, void *, void *, void *, void *, void *, void *);
 
 static const R_CMethodDef CEntries[] = {
     {"logcensor",   (DL_FUNC) &logcensor,   13},
     {"nlogcensor",  (DL_FUNC) &nlogcensor,   6},
     {"nlogcensorx", (DL_FUNC) &nlogcensorx,  1},
-    {"pqlsd",       (DL_FUNC) &pqlsd,        8},
     {"rpqlsd",      (DL_FUNC) &rpqlsd,       7},
     {NULL, NULL, 0}
 };
