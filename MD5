@@ -1,4 +1,4 @@
-804817cfdb166dc7941868b8c154a44e *DESCRIPTION
+754ae46dd8eb9e8e67a6169130e5f376 *DESCRIPTION
 73d98ba76a12b8b7aed3bb0ac4d6183c *NAMESPACE
 0ca12242c714f460cb5c7f628af1693d *R/logspline.R
 e5937390332be13e210110b2f5030d8d *man/dlogspline.Rd
@@ -15,6 +15,6 @@ d9d2d511c4cec309ecc1c2f05d87b121 *man/unstrip.Rd
 8290d2e9740414e315237f0d5d4024bb *src/Makevars
 910e8cf3a5dea39fffba5db2d281662d *src/allpack.f
 a000880e550ec75149475d3095840a5d *src/lsdall.c
-3ed6a299c32fcb7b91b74e582694b6db *src/nlsd.c
+32db9f09384a533dc0951018468f0001 *src/nlsd.c
 8197458ba2a4b07354e1cc3561a908fd *src/registerDynamicSymbol.c
 782c6ba6b56e9842d5854775ce3653e3 *src/x2c.h
