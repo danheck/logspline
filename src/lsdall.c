@@ -108,7 +108,7 @@ static void knotplace(int iknots[],
 static double dens3(double x);
 static double numint(double k1,
                      double k2,
-                     double (*fun)(),
+                     double (*fun)(double x),
                      int accuracy);
 
 static double expin(int version,
@@ -139,7 +139,7 @@ static double fun48(double w,
 static double numints(double vv[],
                       double k1,
                       double k2,
-                      double (*fun)(),
+                      double (*fun)(double, double, double[], int),
                       int accuracy,
                       int ip);
 static double expin2(int version,
@@ -1472,7 +1472,7 @@ static double numint(k1,k2,fun,accuracy)
    accuracy  - accuracy
    r1 and r2 - from (k1,k2) to (-1,1)         */
 
-double k1,k2,(*fun)();
+double k1,k2,(*fun)(double);
 int accuracy;
 {
    double r1,r2,w[33],y[33];
@@ -1534,7 +1534,7 @@ static double numints(vv,k1,k2,fun,accuracy,ip)
    accuracy  - accuracy
    r1 and r2 - from (k1,k2) to (-1,1)         */
 
-double k1,k2,(*fun)(),vv[];
+double k1,k2,(*fun)(double, double, double[], int),vv[];
 int accuracy,ip;
 {
    double y[33],w[33],r1,r2;
@@ -2543,7 +2543,9 @@ double zheta[],info[][NC],shift[],sufficient[][2],bound[],sample[];
 int accuracy,nsample[],what;
 
 {
-   double qolint[7][NC+1],aa[7],d1,e1,cth,d2,e2,fun2(),fun48();
+   double qolint[7][NC+1],aa[7],d1,e1,cth,d2,e2;
+   double fun2(double);
+   double fun48(double, double, double[], int);
    int i1,i2,i3,i4,i5,version,version2,k0;
 /* local: i1,i2,i3,i4,i5 - counter
           polint[]       - integrals of the form x**i.exp(polynomial)         */
@@ -2713,7 +2715,8 @@ double x1,x2,qolint[][NC+1],shift[],info[][NC];
 int n2,what,n1;
 {
    int i1,i2,i3,i4,i5,jl,jr,im;
-   double z0,z1[NC],z2[NC][NC],y1[7],y2[7],fun48();
+   double z0,z1[NC],z2[NC][NC],y1[7],y2[7];
+   double fun48(double, double, double[], int);
 
 /* jl - in which interval is the left endpoint
    jr - in which interval is the right endpoint                               */
@@ -2808,7 +2811,8 @@ double x,qolint[][NC+1],d1,e1,bd,shift[],info[][NC];
 int vs,n1,n2,what;
 {
    int i1,i2,i3,i4,i5,jin,im;
-   double aa[7],z0,yy[7],z1[NC],z2[NC][NC],fun48();
+   double aa[7],z0,yy[7],z1[NC],z2[NC][NC];
+   double fun48(double, double, double[], int);
 
    im = 3*what+1;
 
@@ -2882,7 +2886,8 @@ double x,qolint[][NC+1],d1,e1,bd,shift[],info[][NC];
 int vs,n1,n2,what;
 {
    int i1,i2,i3,i4,i5,jin,im;
-   double aa[7],z0,yy[7],z1[NC],z2[NC][NC],fun48();
+   double aa[7],z0,yy[7],z1[NC],z2[NC][NC];
+   double fun48(double, double, double[], int);
 
    im = 3*what+1;
 
