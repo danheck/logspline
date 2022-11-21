@@ -75,9 +75,9 @@ struct basisfunct {
    sumunc - sum_i B(x_i) over the uncensored data */
 
 
-static int *isvector();
-static short *issvector();
-static double *dsvector(),**dsmatrix();
+static int *isvector(int l);
+static short *issvector(int l);
+static double *dsvector(int l),**dsmatrix(int r, int c);
 static int nlsd();
 static struct space *definespace();
 static void getsame();
