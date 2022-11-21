@@ -54,13 +54,13 @@ double bound[],sample[],yknots[],wk[],wk2[],ycoef[],*alpha,logl[];
 double info[NC][NC],loglikelihood,sufficient[NC][2],coef2[NC][NC],xczheta=0.;
 /* stuf used in iter
    info - the information matrix
-   loglikelihood                                  
+   loglikelihood
    sufficient - sufficient statistics
    coef,coef2 - 2 matrices defining the splines as a function of the knots, see
                 lcoef.c for the exact definitions.                            */
 
 double derivatives[NC],crossprods[NC][NC],suffcombine[NC][2],xzheta[NC];
-/* derivative crossprods used to compute the starting values - see lstart.c    
+/* derivative crossprods used to compute the starting values - see lstart.c
    suffcombine used to compute the sufficient statistics - see lsuff.c        */
 
 double aic,aicmin,r1,rknots[NC],xcoef2[NC][NC];
@@ -68,12 +68,12 @@ double aic,aicmin,r1,rknots[NC],xcoef2[NC][NC];
    r1 - utility
    aic - akaike information criterion
    aicmin - minimum aic encountered
-   alpha - alpha value in aic               
+   alpha - alpha value in aic
    rknots - copy of knots                                                     */
 
 int i,j,nkstart,iremove=0,iknots[NC],xiknots[NC];
 /* local integers
-   i,j,k - counter, utility                                                   
+   i,j,k - counter, utility
    nkstart - number of knots at the beginning of the algorithm
    iremove - number of the knot that is removed                               */
 
@@ -138,8 +138,8 @@ int i,j,nkstart,iremove=0,iknots[NC],xiknots[NC];
 
 /* Compute coefficient matrix.                                                */
    itrouble = 0;
-   do{   
-      coeff(coef2); 
+   do{
+      coeff(coef2);
 
 /* Compute sufficient statistics.                                             */
       suffstat2(suffcombine,coef2,sufficient);
@@ -176,8 +176,8 @@ int i,j,nkstart,iremove=0,iknots[NC],xiknots[NC];
          SorC[27]=nknots;
          nknots=0;
       }
-      
-/* If we have a fixed number of knots we are done now.           
+
+/* If we have a fixed number of knots we are done now.
    Copy the solution in the x-arrays                                         */
       if(nknots>0){
       if(*idelete == 0){
@@ -191,10 +191,10 @@ int i,j,nkstart,iremove=0,iknots[NC],xiknots[NC];
          }
          logl[0]=loglikelihood*nsample[0]+log(qt[1])*nsample[1]; /* &&&&& */
       }
-   
+
 /* We are deleting knots. Compute aic. Is it an improvement?                  */
       else {
-         aic = -2. * loglikelihood * nsample[0] + *alpha * (nknots-1);      
+         aic = -2. * loglikelihood * nsample[0] + *alpha * (nknots-1);
          logl[nknots-1]=loglikelihood*nsample[0]+log(qt[1])*nsample[1]; /* &&&&& */
          if(aic <= aicmin){
 
@@ -217,7 +217,7 @@ int i,j,nkstart,iremove=0,iknots[NC],xiknots[NC];
             if(r1 >= aicmin) nknots = 0;
          }
 
-      
+
 /* If there were more than 4 knots, we should remove one.                     */
          if(nknots >= 4){
 
@@ -298,7 +298,7 @@ double info[][NC],coef2[][NC];
 	      phi[i] = fabs(phi[i]);
 	   }
 
-	/* Invert the information matrix, giving the approximate covariance 
+	/* Invert the information matrix, giving the approximate covariance
 	   matrix for zheta                                                           */
 	   i= nknots-1;
 	   j=NC;
@@ -310,7 +310,7 @@ double info[][NC],coef2[][NC];
       for(j=0;j<i;j++)
          info[j][i] = info[i][j];
 
-/* Take linear combinations, to get the standard errors of phi      
+/* Take linear combinations, to get the standard errors of phi
    we don't use the tail ones                                                 */
    for(i=1;i< nknots-1;i++){
       se[i] = 0.;
@@ -418,7 +418,7 @@ int SorC[],accuracy,nsample[],*itrouble;
       jaja1=0;
       counter++;
 
-/* if something changed in the bounds since last time counter = 0, and we have 
+/* if something changed in the bounds since last time counter = 0, and we have
    to recompute czheta and the loglikelihood                                  */
       i7=0;
       do{
@@ -441,7 +441,7 @@ int SorC[],accuracy,nsample[],*itrouble;
                i2=-6;
                i7++;
                if(i7==200){
-                  *itrouble=5;  
+                  *itrouble=5;
                   return 1.;
                }
             }
@@ -449,11 +449,11 @@ int SorC[],accuracy,nsample[],*itrouble;
          newlikelihood=likeli(zheta,nsample,sample,bound,accuracy);
       }
       i2=1000*nknots+i1;
-      
+
 /* compute score (stored in shift), info and czheta                           */
       czheta = middle(info,shift,sufficient,bound,accuracy,
                                                         nsample,sample,zheta,2);
-           
+
 /* store the loglikelihood of the previous iteration                          */
       oldlikelihood = newlikelihood;
 
@@ -482,7 +482,7 @@ int SorC[],accuracy,nsample[],*itrouble;
       iii[1]=0;
       iii[2]=0;
       if(nsample[2]+nsample[3]+nsample[4] >0)
-         F77_CALL(xdsidi)(work,&i2,&i3,kpvt,dd,iii,rvr,&i4); 
+         F77_CALL(xdsidi)(work,&i2,&i3,kpvt,dd,iii,rvr,&i4);
       for(i4=0;i4<nknots-1;i4++)rvr[i4]=shift[i4];
       iii[3]=iii[1]+iii[2];
       if(iii[2]+iii[1]==0)nrc=0;
@@ -504,7 +504,7 @@ int SorC[],accuracy,nsample[],*itrouble;
           nrc=0;
       }
       if(iii[2]+iii[1]==0){
-         F77_CALL(xdsisl)(work,&i2,&i3,kpvt,shift);  
+         F77_CALL(xdsisl)(work,&i2,&i3,kpvt,shift);
 
 /* compute the stop criterion and adjust stepsize, if too large               */
          i7=0;
@@ -614,7 +614,7 @@ int SorC[],accuracy,nsample[],*itrouble;
             bound[1] = 1;
             counter = 0;
          }
-         if(cbound[6]<0. && bound[3] < 0.5 && 
+         if(cbound[6]<0. && bound[3] < 0.5 &&
             (cbound[6]>-6.||zheta[nknots-2]+shift[nknots-2]>0)){
             cbound[6] = -cbound[6];
             bound[4] = cbound[6] * (knots[nknots-1] - knots[nknots-2]) +
@@ -678,14 +678,14 @@ int SorC[],accuracy,nsample[],*itrouble;
                       newlikelihood=likeli(zheta,nsample,sample,bound,5);
                    }
                    return newlikelihood;
-                } 
+                }
                 else {
                    accuracy = 5;
                    counter = 0;
                 }
             }
             else {
-          
+
 /* If we were not integrating to +/- infinity, we either double the
    integration tails (if a tail zheta was possitive) or we go for it:
    +/- infinity (That means cbound[5] and cbound[6] become negative.)         */
@@ -693,7 +693,7 @@ int SorC[],accuracy,nsample[],*itrouble;
 /* Left tail                                                                  */
                if(cbound[5] < 0)                                /* case A     */
                   cbound[5] = 2. * cbound[5];
-               else{        
+               else{
                   if(cbound[1] < 0.5 && zheta[0] >=0.){         /* case B     */
                      cbound[5] = 2. * cbound[5];
                      bound[2] = cbound[5] * (knots[0] - knots[1]) + knots[0];
@@ -707,14 +707,14 @@ int SorC[],accuracy,nsample[],*itrouble;
                      bound[2] = cbound[5] * (knots[0] - knots[1]) + knots[0];
                      if(bound[2] < cbound[2]){                  /* goto C/D   */
                         bound[2] = cbound[2];
-                        bound[1] = 2.;   
+                        bound[1] = 2.;
                      }
                   }
                }
 /* Right tail                                                                 */
                if(cbound[6] < 0)                                /* case A     */
                   cbound[6] = 2. * cbound[6];
-               else{        
+               else{
                   if(cbound[3] < 0.5 && zheta[nknots-2] >=0.){  /* case B     */
                      cbound[6] = 2. * cbound[6];
                      bound[4] = cbound[6] * (knots[nknots-1] - knots[nknots-2])
@@ -731,7 +731,7 @@ int SorC[],accuracy,nsample[],*itrouble;
                                                              + knots[nknots-1];
                      if(bound[4] > cbound[4]){                  /* goto C/D   */
                         bound[4] = cbound[4];
-                        bound[3] = 2;   
+                        bound[3] = 2;
                      }
                   }
                }
@@ -789,12 +789,12 @@ D               zheta[0]>=0, bound[2]<cbound[2]:
 E                            bound[2]>=cbound[2]:
                                      cbound[5]=1,  bound[1]=1              */
    if(zheta[0]<0. && cbound[1] < 0.5 && nsample[0] == nsample[1])
-      cbound[5] = -1.;        
+      cbound[5] = -1.;
    if(cbound[1] < 0.5 && (zheta[0] >= 0. || nsample[0]!=nsample[1]))
       bound[1] = 1;
    if(cbound[1] > 0.5) bound[1] = 2;
    if(cbound[1] > 0.5 && zheta[1] >= 0. && bound[2] >= cbound[2]) bound[1] = 1;
-   if(cbound[1] > 0.5 && (zheta[0]<0. || (zheta[0] >= 0. && 
+   if(cbound[1] > 0.5 && (zheta[0]<0. || (zheta[0] >= 0. &&
                    bound[2] < cbound[2]))) bound[2] = cbound[2];
 
 /* the upper tail almost similar                                              */
@@ -804,7 +804,7 @@ E                            bound[2]>=cbound[2]:
    if(nsample[4]*3>nsample[1])cbound[6]=0.5;
    bound[4] = cbound[6] * (knots[nknots-1] - knots[nknots-2]) + knots[nknots-1];
    if(zheta[nknots-2]<0. && cbound[3] < 0.5 && nsample[0] == nsample[1])
-      cbound[6] = -cbound[6]; 
+      cbound[6] = -cbound[6];
    if(cbound[3] < 0.5 && (zheta[nknots-2] >=0. || nsample[0]!=nsample[1]))
       bound[3] = 1;
    if(cbound[3] > 0.5) bound[3] = 2;
@@ -812,7 +812,7 @@ E                            bound[2]>=cbound[2]:
       bound[3] = 1;
    if(cbound[3] > 0.5 && (zheta[nknots-2]<0. || (zheta[nknots-2] >= 0. &&
               bound[4] > cbound[4]))) bound[4] = cbound[4];
-      
+
 }
 /******************************************************************************/
 /* this file contains a few miscelaneous routines
@@ -824,7 +824,7 @@ E                            bound[2]>=cbound[2]:
 
 /******************************************************************************/
 
-/* this function computes the stopcriterion (zerror) and adjust the stepsize 
+/* this function computes the stopcriterion (zerror) and adjust the stepsize
    (shift) if this is too large.                                              */
 
 static double erroradjust(shift)
@@ -851,7 +851,7 @@ double shift[];
       for(i=0; i<nknots-1; i++){
          r2 = fabs(zheta[i]);
          if(r2<0.00001) r2 = 0.00001;
-         r1 = r1 + fabs(shift[i]) / r2; 
+         r1 = r1 + fabs(shift[i]) / r2;
       }
       r2=r1;
    }
@@ -978,7 +978,7 @@ int nsample[],accuracy;
       }
    }
    else{
-/* approximate, first right censored - essentially as above   
+/* approximate, first right censored - essentially as above
    there are ng3 points at xg                                                 */
       if(nsample[3]>0){
          i1=0;
@@ -994,10 +994,10 @@ int nsample[],accuracy;
                }
                else likl=likl+ng3[i2]*log(expin(iv,xg[i2],bound[4],aa));
                if(i1==nsample[3])i2=NC+3;
-            }   
-         }   
-      }   
-/* approximate, now left censored - essentially as above   
+            }
+         }
+      }
+/* approximate, now left censored - essentially as above
    there are ng4 points at xg                                                 */
       if(nsample[4]>0){
          i1=0;
@@ -1013,9 +1013,9 @@ int nsample[],accuracy;
                }
                else likl=likl+ng4[i2]*log(expin(iw,xg[i2],bound[2],bb));
                if(i1==nsample[4])i2=NC+3;
-            }   
-         }   
-      }   
+            }
+         }
+      }
 /* the interval censored stuff is easy                                        */
       if(nsample[2]>0){
          for(i1=0;i1<nsample[2];i1++){
@@ -1088,7 +1088,7 @@ int nsample[],accuracy;
    }
    return maxll;
 }
-   
+
 /******************************************************************************/
 
 /* this routine computes the loglikelihood in zheta+2^rt shift                */
@@ -1114,8 +1114,8 @@ int accuracy,*err,nsample[];
       return 0.;
    }
    j=0;
-   if(czheta > -5)j++; 
-   if(czheta < 5)j++; 
+   if(czheta > -5)j++;
+   if(czheta < 5)j++;
    if(j==0){
       *err=1;
       return 0.;
@@ -1165,20 +1165,20 @@ numint - computes a numerical integral
 numints- computes a vector of numerical integrals                             */
 
 /******************************************************************************/
-/*   this function computes (analytical) the integral:   
-                                                          
-      t1 t1 inf t2                                         
-      /   /  /  /     2.          a4*x+a5                       
-      |   |  |  |(a1*x +a2*x+a3)*e       dx                        
-      /   /  /  /                                            
-    -inf t2 t1 t1                                              
+/*   this function computes (analytical) the integral:
+
+      t1 t1 inf t2
+      /   /  /  /     2.          a4*x+a5
+      |   |  |  |(a1*x +a2*x+a3)*e       dx
+      /   /  /  /
+    -inf t2 t1 t1
       1   2.  3  4     <==== version                              */
-                                                                 
+
 
 static double expin(version,t1,t2,a)
 
 /* input: a,b,c,d,e,t1,t2,version: see figure above
-   local: a1,b1,c1: as a,b and c, but for the primitive.                      
+   local: a1,b1,c1: as a,b and c, but for the primitive.
           f1,f2 half-products                                    */
 int version;
 double t1,t2,a[];
@@ -1193,7 +1193,7 @@ double t1,t2,a[];
       a1 = a[1]/a[4];
       b1 = (a[2]-2*a1)/a[4];
       c1 = (a[3]-b1)/a[4];
-      f1 = a1*t1*t1+b1*t1+c1; 
+      f1 = a1*t1*t1+b1*t1+c1;
       i1 = 1;
       if(f1<0) i1 = -1;
       f1 = log(fabs(f1)) + a[4]*t1+a[5];
@@ -1206,7 +1206,7 @@ double t1,t2,a[];
          if(f2 > 2000.) f2=2000.;
          if(version == 2)return i1*exp(f1)-i2*exp(f2);
          return i2*exp(f2)-i1*exp(f1);
-      } 
+      }
       if(version==1) return i1*exp(f1);
       return -i1*exp(f1);
    }
@@ -1222,7 +1222,7 @@ polinomial                                                                    */
 static double expin2(version,t1,t2,aa,b1,b0)
 
 /* input: aa,b1,b0,t1,t2,version: see figure above
-   local: u6,u5,u4,u3,u2,u1,u0: as a4,a3,a2,a1,a0, but for the primitive.            
+   local: u6,u5,u4,u3,u2,u1,u0: as a4,a3,a2,a1,a0, but for the primitive.
           f1,f2 half-products                                    */
 int version;
 double t1,t2,aa[],b1,b0;
@@ -1254,7 +1254,7 @@ double t1,t2,aa[],b1,b0;
          if(f2 > 2000.) f2=2000.;
          if(version == 2)return i1*exp(f1)-i2*exp(f2);
          return i2*exp(f2)-i1*exp(f1);
-      } 
+      }
       if(version==1) return i1*exp(f1);
       return -i1*exp(f1);
    }
@@ -1285,13 +1285,13 @@ double x;
    double f;
 
 /* circle through the knots                                                   */
-      for(j=0; (j<nknots && x > knots[j]); j++); 
+      for(j=0; (j<nknots && x > knots[j]); j++);
       f = -log(czheta);
 
 /* find in between which knots the point is, and compute the spline           */
       for(k=j-3; k<j+1; k++){
          if(k>=0 && k<=nknots){
-            f = f + zheta[k] * (coef[k][0][j] + x * (coef[k][1][j] 
+            f = f + zheta[k] * (coef[k][0][j] + x * (coef[k][1][j]
                   + x * (coef[k][2][j] + x * coef[k][3][j])));
          }
       }
@@ -1307,7 +1307,7 @@ double x;
 
 static double numint(k1,k2,fun,accuracy)
 
-/* Intgerals using Gauss-Legendre quadrature with 12 points    
+/* Intgerals using Gauss-Legendre quadrature with 12 points
    y1,y2,... - abisces
    w1,w2,... - weight
    accuracy  - accuracy
@@ -1369,7 +1369,7 @@ int accuracy;
 /***************************************/
 static double numints(vv,k1,k2,fun,accuracy,ip)
 
-/* Intgerals using Gauss-Legendre quadrature with 12 points    
+/* Intgerals using Gauss-Legendre quadrature with 12 points
    y1,y2,... - abisces
    w1,w2,... - weight
    accuracy  - accuracy
@@ -1388,7 +1388,7 @@ int accuracy,ip;
       w[2 ]= 0.360761573048139 * r1; y[2 ]= 0.661209386466265 * r1;
       w[3 ]= 0.171324429379170 * r1; y[3 ]= 0.932469514203152 * r1;
       for(i1=0;i1<ip;i1++)vv[i1]=0.;
-      for(i1=1;i1<4;i1++){ 
+      for(i1=1;i1<4;i1++){
          fun(w[i1],r2-y[i1],vv,ip);
          fun(w[i1],r2+y[i1],vv,ip);
       }
@@ -1435,7 +1435,7 @@ int accuracy,ip;
 }
 /******************************************************************************/
 
-/* These are 5 functions that are used in integration routines.     
+/* These are 5 functions that are used in integration routines.
 
    dfunpar[] - parameters used by the integrayion routines.                   */
 
@@ -1474,7 +1474,7 @@ int ip;
 /* this file contains functions that are executed - before the iterations start-
    by the main program.
 
-   coeff  - computes the coefficient matrices for the basis functions          
+   coeff  - computes the coefficient matrices for the basis functions
    start1 - gathers statistics used to compute the starting values
    start2 - computes the starting values
    sufficient1 - gathers statistics used to compute the sufficientt statistics
@@ -1491,14 +1491,14 @@ double coef2[][NC];
    coef2:
    first index: basis function number-1,
    second index: 0:1, 1:x, 2:(x-t1)+^3,  3:(x-t2)+^3, 4:(x-t3)+^3,........
-   coef: 
+   coef:
    between knot(i) and knot(i+1) the coefficient of x^power of basisfunction(j)
    first index: basis function number-1 (j-1)
    second index: power of x
-   third index: interval (i)                                                  
+   third index: interval (i)
 
    Basis functions B(2)-B(nknots-3) are multiples of B-splines.
-   Further the coefficients are choosen such that the quadratic and  
+   Further the coefficients are choosen such that the quadratic and
    cubic terms in both tails are 0;  this leads to differnt basis
    functions for B(1), B(nknots-2) and B(nknots-1). B(1) is linear left
    of the first knot. B(nknots-2) is constant to the right of the last
@@ -1526,7 +1526,7 @@ double coef2[][NC];
    coef2[0][2] = 1.;
    coef2[0][3] = (knots[0] - knots[2]) / (knots[2] - knots[1]);
    coef2[0][4] = (knots[1] - knots[0]) / (knots[2] - knots[1]);
-   coef2[0][1] = -3. * (pow(knots[0], 2.) 
+   coef2[0][1] = -3. * (pow(knots[0], 2.)
                      + coef2[0][3] * pow(knots[1], 2.)
                      + coef2[0][4] * pow(knots[2], 2.));
    coef2[0][0] = - knots[nknots-1] * coef2[0][1]
@@ -1535,10 +1535,10 @@ double coef2[][NC];
                  - coef2[0][4] * pow((knots[nknots-1] - knots[2]), 3.);
    coef2[0][5] = 0.;
    coef2[nknots-2][nknots-1] = 1.;
-   coef2[nknots-2][nknots]   = (knots[nknots-3] - knots[nknots-1]) / 
+   coef2[nknots-2][nknots]   = (knots[nknots-3] - knots[nknots-1]) /
                                (knots[nknots-1] - knots[nknots-2]);
    coef2[nknots-2][nknots+1] = (knots[nknots-2] - knots[nknots-3]) /
-                               (knots[nknots-1] - knots[nknots-2]);    
+                               (knots[nknots-1] - knots[nknots-2]);
 
 /* we first create basis functions that are 0 before knot[i] and constant
    after knot [i+3]                                                           */
@@ -1578,21 +1578,21 @@ double coef2[][NC];
 
 /* The rest is a bit tricking with the correct indices                        */
    for(i=0; i<nknots-1; i++){
-      for(j=i; j<i+4; j++){ 
-         for(k=i+1; k<j+2; k++){ 
+      for(j=i; j<i+4; j++){
+         for(k=i+1; k<j+2; k++){
             if(j > 0 && j < nknots+1 && (i != 0 || j != 3)){
                if(k != 1){
-                  coef[i][0][j] = coef[i][0][j] - 
+                  coef[i][0][j] = coef[i][0][j] -
                                   coef2[i][k] * pow(knots[k-2], 3.);
-                  coef[i][1][j] = coef[i][1][j] + 
+                  coef[i][1][j] = coef[i][1][j] +
                                   3. * coef2[i][k] * pow(knots[k-2], 2.);
                   coef[i][2][j] = coef[i][2][j] - 3. * coef2[i][k] * knots[k-2];
                   coef[i][3][j] = coef[i][3][j] + coef2[i][k];
                }
             }
-         }  
-      }  
-   }    
+         }
+      }
+   }
 }
 /******************************************************************************/
 
@@ -1641,7 +1641,7 @@ int nsample[];
             derivatives[j+1] = derivatives[j+1] + 6 * (sample[i] - knots[j]);
             crossprods[j+1][0]=crossprods[j+1][0]+3*pow(sample[i]-knots[j],2.);
             for(k=0; k<=j; k++)
-               crossprods[j+1][k+1] = crossprods[j+1][k+1] + 
+               crossprods[j+1][k+1] = crossprods[j+1][k+1] +
                   9 * pow(((sample[i] - knots[j]) * (sample[i] - knots[k])),2.);
          }
       }
@@ -1654,7 +1654,7 @@ int nsample[];
             derivatives[j+1] = derivatives[j+1] + 6 * (xs - knots[j]);
             crossprods[j+1][0]=crossprods[j+1][0]+3*pow(xs-knots[j],2.);
             for(k=0; k<=j; k++)
-               crossprods[j+1][k+1] = crossprods[j+1][k+1] + 
+               crossprods[j+1][k+1] = crossprods[j+1][k+1] +
                   9 * pow(((xs - knots[j]) * (xs - knots[k])),2.);
          }
       }
@@ -1668,7 +1668,7 @@ int nsample[];
             derivatives[j+1] = derivatives[j+1] + 1.5 * (uuu - knots[j]);
             crossprods[j+1][0]=crossprods[j+1][0]+0.75*pow(uuu-knots[j],2.);
             for(k=0; k<=j; k++)
-               crossprods[j+1][k+1] = crossprods[j+1][k+1] + 
+               crossprods[j+1][k+1] = crossprods[j+1][k+1] +
                   2.25 * pow(((uuu - knots[j]) * (uuu - knots[k])),2.);
          }
       }
@@ -1683,7 +1683,7 @@ int nsample[];
             derivatives[j+1] = derivatives[j+1] + 1.5 * (uuu - knots[j]);
             crossprods[j+1][0]=crossprods[j+1][0]+0.75*pow(uuu-knots[j],2.);
             for(k=0; k<=j; k++)
-               crossprods[j+1][k+1] = crossprods[j+1][k+1] + 
+               crossprods[j+1][k+1] = crossprods[j+1][k+1] +
                   2.25 * pow(((uuu - knots[j]) * (uuu - knots[k])),2.);
          }
       }
@@ -1710,7 +1710,7 @@ int nkstart,iremove;
 
 /* local:
    i j j2 k l l2  - counters
-   work           - workmatrix, 
+   work           - workmatrix,
    infox kpvt     - reguired by inversion routine                             */
 
 /* Initializations */
@@ -1749,7 +1749,7 @@ int nkstart,iremove;
             }
          }
       }
-      
+
 /* Make symmetric                                                             */
       for(i=1; i<nknots-1; i++)
          for(j=0; j<i; j++)
@@ -1802,10 +1802,10 @@ static void suffstat1(suffcombine,sample,nsample)
 
 double suffcombine[][2],sample[];
 int nsample[];
-/* these quantities are defined in lhead.h and the file where they originate  
+/* these quantities are defined in lhead.h and the file where they originate
    suffcombine[0][a] = 1
    suffcombine[1][a] = sum(sample)/nsample[0]
-   suffcombine[i][a] = sum(((sample-knot[i-1])+)^3)/nsample[0]                    
+   suffcombine[i][a] = sum(((sample-knot[i-1])+)^3)/nsample[0]
    where a is 0 for the exact sample and 1 for the interval censored stuff.
    they are later (in suffstat2) combined to compute the sufficient statistics*/
 
@@ -1828,7 +1828,7 @@ int nsample[];
       suffcombine[1][0] = suffcombine[1][0] + sample[j]/(double)nsample[0];
       for(i=2; i<nknots+2; i++)
          if(sample[j] > knots[i-2])
-           suffcombine[i][0] = suffcombine[i][0] + 
+           suffcombine[i][0] = suffcombine[i][0] +
                            pow(sample[j]  - knots[i-2], 3.)/(double)nsample[0] ;
    }
 /* for the interval censored observations                                     */
@@ -1837,7 +1837,7 @@ int nsample[];
       suffcombine[1][1] = suffcombine[1][1] + rr/(double)nsample[0];
       for(i=2; i<nknots+2; i++)
          if(rr > knots[i-2])
-           suffcombine[i][1] = suffcombine[i][1] + 
+           suffcombine[i][1] = suffcombine[i][1] +
                           pow(rr  - knots[i-2], 3.)/(double)nsample[0] ;
    }
 }
@@ -1858,7 +1858,7 @@ double suffcombine[][2],coef2[][NC],sufficient[][2];
    for(i=0;i<nknots;i++){
       sufficient[i][0] = 0.;
       sufficient[i][1] = 0.;
-         
+
 /* over the intervals                                                         */
       for(j=0;j<nknots+2;j++){
          sufficient[i][0] = sufficient[i][0] + suffcombine[j][0] * coef2[i][j];
@@ -1870,7 +1870,7 @@ double suffcombine[][2],coef2[][NC],sufficient[][2];
 /* These routines determine the position of the knots and the number of knots.*/
 
 static void knotplace(iknots,rknots,iknotauto,bound,sample,nsample,SorC,smp2,smp3,qt)
-                                    
+
 
 int iknots[],iknotauto,SorC[],nsample[];
 double rknots[],sample[],bound[],smp2[],smp3[],qt[];
@@ -1987,7 +1987,7 @@ double rknots[],sample[],bound[],smp2[],smp3[],qt[];
 
 /* s should become exactly (nsample[0]-1)/2: in that case the knots
    are symmetric and cover exactly the whole range.
-   We here compute what s would be for the present value of eps 
+   We here compute what s would be for the present value of eps
    s is the span of all the knots: i.e. the location of the middle knot
    if the first knot is at 1, nknots as specified and eps as guessed.         */
 
@@ -1998,7 +1998,7 @@ double rknots[],sample[],bound[],smp2[],smp3[],qt[];
                for(i=1; i<=j2; i++){
                   v = i;
 /* s is the location after adding another knot                                */
-                  s = s + w;   
+                  s = s + w;
 /* we store the rknots - in case they are good                                */
                   rknots[i] = s;
                   rknots[nknots-i-1] = nsample[0] + 1 - s;
@@ -2008,21 +2008,21 @@ double rknots[],sample[],bound[],smp2[],smp3[],qt[];
                   w = w * v;
                }
 /* Are there an odd or even number of gaps?                                   */
-               if(j * 2 == nknots) 
+               if(j * 2 == nknots)
 /* even - no more knots to place.                                             */
-                  s = s + w/2.;     
+                  s = s + w/2.;
                else
 /* odd - the last knot                                                        */
                   rknots[j] = (nsample[0] + 1.) / 2.;
-   
+
 /* Is eps too large or too small?                                             */
-               if(2. * s >= nsample[0]+1) 
+               if(2. * s >= nsample[0]+1)
                   eps1 = eps;
                else
                   eps2 = eps;
-   
+
 /* Are eps1 and eps2 close together                                           */
-            } while(eps2 - eps1 > .001);   
+            } while(eps2 - eps1 > .001);
          }
          else{
 /* if both sides there are finite limits we put them equidistant              */
@@ -2031,7 +2031,7 @@ double rknots[],sample[],bound[],smp2[],smp3[],qt[];
                    1.+(double)(nsample[0]-1)*((double)i)/(double)(nknots-1);
             }
             else{
-/* one side bounded, one side unbounded half of the five-rule              
+/* one side bounded, one side unbounded half of the five-rule
    which side is bounded?                                                     */
                rknots[0]=1.;
                rknots[nknots-1]=nsample[0];
@@ -2069,7 +2069,7 @@ double rknots[],sample[],bound[],smp2[],smp3[],qt[];
 /* Translate rknots in knots                                                  */
          if(ll==0){
 /* the first two knots are easy                                               */
-            knots[0] = smp2[0];     
+            knots[0] = smp2[0];
             knots[nknots-1] = smp2[il];
 
  /* cycle through the endpoints, average                                      */
@@ -2092,14 +2092,14 @@ double rknots[],sample[],bound[],smp2[],smp3[],qt[];
 /* find the first and the third quartile                                      */
          for(i=1;i<il;i++){
             if(smp3[i]>0.25*nsample[0]){
-               u3=smp2[i];  
+               u3=smp2[i];
                i=i+2*il;
                qt[0]=u3;
             }
          }
          for(i=1;i<il+1;i++){
             if(smp3[i]>0.75*nsample[0]){
-               u4=smp2[i];  
+               u4=smp2[i];
                i=i+2*il;
                qt[1]=u4;
             }
@@ -2146,7 +2146,7 @@ double rknots[],sample[],bound[],smp2[],smp3[],qt[];
       }while(kk>0);
       if(ll==1||ll==3)bound[1]=0.;
       if(ll==2||ll==3)bound[3]=0.;
-   
+
 /* if after previous changes these knots are still to close together, the
    density might be real high at the end - we toss out knots in this case     */
    u1=knots[nknots-1]-knots[nknots-3];
@@ -2194,7 +2194,7 @@ double rknots[],sample[],bound[],smp2[],smp3[],qt[];
 
 /* Remove double knots,either store zerror messages, or print them.            */
 
-   j = 0;                          
+   j = 0;
    k = 0;
    for(i=1; i<nknots; i++){
       if(knots[i] > knots[j]){
@@ -2234,7 +2234,7 @@ double rknots[],sample[],bound[],smp2[],smp3[],qt[];
       rknots[i] = u4 + u3 * knots[i];
       knots[i] = u4 + u3 * knots[i];
       iknots[i] = i;
-   }           
+   }
    for(i=0;i<nsample[0]+nsample[2];i++)sample[i]=u4+u3*sample[i];
 }
 
@@ -2251,7 +2251,7 @@ int idelete,nsample[],nknots,SorC[];
    double r;
 
    nn=nsample[1]+nsample[2]+(nsample[3]+nsample[4])/2;
-   if(nknots>=NC || (nknots > nsample[5]+1 && nsample[5]>1)){ 
+   if(nknots>=NC || (nknots > nsample[5]+1 && nsample[5]>1)){
       if(SorC[0]==0)
          (void)Rprintf("can not run with that many knots\n");
       else
@@ -2308,7 +2308,7 @@ int nsample [];
       F77_CALL(xssort)(smp2,smp3,&j,&i);
       for(i=0;i<nsample[4];i++)
          sample[i+nsample[1]+2*nsample[2]+nsample[3]]=smp2[i];
-   } 
+   }
    for(i=0;i<nsample[1];i++){
       smp2[i]=sample[i];
       smp3[i]=1.;
@@ -2341,7 +2341,7 @@ int nsample [];
       }
    }
    il=i;
-      
+
    for(i=il-1;i>=0;i=i-1){
       if(smp3[i]>0){
          smp3[i+1]=smp3[i+1]+0.5*smp3[i];
@@ -2394,7 +2394,7 @@ int accuracy,nsample[],what;
 
 /* what == 0: we are only interested in czheta                                */
    if(what==0){
-      for(i1=1; i1<nknots; i1++){               
+      for(i1=1; i1<nknots; i1++){
          for(i2=1; i2<5; i2++){
             dfunpar[i2]=0.;
             for(i3=i1-3; i3<i1+1; i3++){
@@ -2408,7 +2408,7 @@ int accuracy,nsample[],what;
    }
 
 /* The integrals are computed numerically per interval between knots          */
-   for(i1=1;i1<nknots;i1++){               
+   for(i1=1;i1<nknots;i1++){
 
 /* polint gets the result of a numerical integration of the density
    times x^i2                                                                 */
@@ -2434,7 +2434,7 @@ int accuracy,nsample[],what;
                      for(i5=0;i5<4;i5++)
                         for(i4=0;i4<4;i4++)
                            info[i2][i3] = info[i2][i3] + qolint[i5+i4][i1]
-                                     * coef[i2][i5][i1] * coef[i3][i4][i1];     
+                                     * coef[i2][i5][i1] * coef[i3][i4][i1];
             }
          }
       }
@@ -2475,7 +2475,7 @@ int accuracy,nsample[],what;
          if(i2!=0)aa[i2-1]=0.;
          qolint[i2][0]=expin2(version2,knots[0],bound[2],aa,d2,e2);
       }
-   
+
       if(accuracy!=0){
          if(nsample[3]>0){
             k0=1;
@@ -2588,11 +2588,11 @@ int n2,what,n1;
    for(i1=1; i1<nknots; i1++){
      if(i1>jl && i1<jr) z0 = z0 + qolint[0][i1];
      for(i3=i1-3; i3<=i1 && i3<nknots-1; i3++) if(i3>=0){
-	if(i1>jl && i1<jr) 
+	if(i1>jl && i1<jr)
            for(i2=0; i2<4; i2++)
 	      z1[i3] = z1[i3] + coef[i3][i2][i1] * qolint[i2][i1];
         if(what==2){
-           for(i4=i1-3; i4<=i1 && i4<nknots-1;i4++) 
+           for(i4=i1-3; i4<=i1 && i4<nknots-1;i4++)
               if(i4>=0 && i1>jl && i1<jr)
                  for(i2=0; i2<4; i2++)
                     for(i5=0;i5<4;i5++)
@@ -2608,14 +2608,14 @@ int n2,what,n1;
       for(i2=0; i2<4; i2++)
          z1[i3] = z1[i3] + coef[i3][i2][jl] * y1[i2];
       if(what  == 2){
-         for(i4=jl-3; i4<=jl && i4<nknots-1; i4++) 
+         for(i4=jl-3; i4<=jl && i4<nknots-1; i4++)
             if(i4>=0)
                for(i2=0;i2<4;i2++)
-                  for(i5=0;i5<4;i5++) 
+                  for(i5=0;i5<4;i5++)
                      z2[i3][i4] = z2[i3][i4] + coef[i3][i2][jl]
                                    * y1[i2+i5] * coef[i4][i5][jl];
-      } 
-   } 
+      }
+   }
 /* we now compute them for the interval in which the right endpoint is - since
    y2 = 0 if this interval is the same as the left one, we do not count double*/
    for(i3=jr-3; i3<=jr && i3<nknots-1; i3++) if(i3>=0){
@@ -2625,11 +2625,11 @@ int n2,what,n1;
          for(i4=jr-3; i4<=jr && i4<nknots-1; i4++)
             if(i4>=0)
                for(i2=0;i2<4;i2++)
-                  for(i5=0;i5<4;i5++) 
+                  for(i5=0;i5<4;i5++)
                      z2[i3][i4] = z2[i3][i4] + coef[i3][i2][jr]
                                    * y2[i2+i5] * coef[i4][i5][jr];
-      } 
-   } 
+      }
+   }
 
 /* now we update shift and info                                               */
    if(z0>0.){
@@ -2704,14 +2704,14 @@ int vs,n1,n2,what;
                      z2[i3][i4] = z2[i3][i4] + coef[i3][i2][jin] * yy[i2+i5]
                                   * coef[i4][i5][jin];
       }
-   } 
+   }
 
 /* update shift and info                                                      */
    if(z0>0.){
       for(i3=0; i3<nknots-1; i3++){
          shift[i3] = shift[i3] - n1 * z1[i3] / (z0 * n2);
          if(what == 2){
-            for(i4=0; i4<nknots-1; i4++) info[i3][i4] = info[i3][i4] 
+            for(i4=0; i4<nknots-1; i4++) info[i3][i4] = info[i3][i4]
                          + n1 * (z1[i3] * z1[i4] / z0 - z2[i3][i4]) / (n2 * z0);
          }
       }
@@ -2778,14 +2778,14 @@ int vs,n1,n2,what;
                      z2[i3][i4] = z2[i3][i4] + coef[i3][i2][jin] * yy[i2+i5]
                                   * coef[i4][i5][jin];
       }
-   } 
+   }
 
 /* update shift and info                                                      */
    if(z0>0.){
       for(i3=0; i3<nknots-1; i3++){
          shift[i3] = shift[i3] - n1 * z1[i3] / (z0 * n2);
          if(what == 2){
-            for(i4=0; i4<nknots-1; i4++) info[i3][i4] = info[i3][i4] 
+            for(i4=0; i4<nknots-1; i4++) info[i3][i4] = info[i3][i4]
                          + n1 * (z1[i3] * z1[i4] / z0 - z2[i3][i4]) / (n2 * z0);
          }
       }
@@ -2805,7 +2805,7 @@ int nknots,what;
 /* local:
    a,version:    for expin
    i,j      :    counters                                                     */
-      
+
 /* Initialize cth, score and info                                             */
    cth = 0.;
    if(what>=1){
@@ -2815,9 +2815,9 @@ int nknots,what;
       }
    }
 
-/* Now we are going to compute the integrals, first the ones  
-   for the left tail, then the right tail, a large number of   
-   integrals are zero, and they do not have to be computed  
+/* Now we are going to compute the integrals, first the ones
+   for the left tail, then the right tail, a large number of
+   integrals are zero, and they do not have to be computed
 
    First the left-tail, only the first basisfunction is not
    equal to 0 here. It only has a linear and a constant term
@@ -2825,7 +2825,7 @@ int nknots,what;
 
    version=1;
    if(bound[1] > 0.5) version=2;
-      
+
 /* The numbers a1,b1,c1,d1,e1 are constants in the integrals                  */
    a[1] = 0.;
    a[4] = zheta[0] * coef[0][1][0];
@@ -2845,8 +2845,8 @@ int nknots,what;
          a[3]=coef[0][0][0]*coef[0][0][0];
          info[0][0] =expin(version,knots[0],bound[2],a)/czheta;
       }
-   } 
-      
+   }
+
 /* Now the right tail. Only the last 2 basisfunctions are not
    equal to 0 here. The last one has a linear and a constant
    term, the one but last one only a constant term.                           */

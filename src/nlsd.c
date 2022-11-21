@@ -22,8 +22,8 @@
 #define Salloc(n, t)  (t *)R_alloc((long)(n), (int)sizeof(t))
 #define MAXKNOTS 60
 
-struct datastruct { 
-int ndata; 
+struct datastruct {
+int ndata;
 double *data;
    int *idata;
    short *same;
@@ -34,7 +34,7 @@ double *data;
    dat  - data
    idat - the ips are the integration points: idat indicates
           what the integration point immediately to the left of a datapoint is
-   same - is the observation the same as the previous in the same category? 
+   same - is the observation the same as the previous in the same category?
    kdata - relates the total order to the data, if kdata[37]=(0,18), the
            37th datapoint is #18 in dat0: a first index of 2 refers to dat2
            3 to dat3, 4 to the first column of dat4 and 5 to the second column
@@ -58,7 +58,7 @@ struct space {
    score   - score function
    ips     - integration points
    low     - lower integration boundary
-   upp     - upper integration boundary 
+   upp     - upper integration boundary
    cth     - ctheta */
 
 struct basisfunct {
@@ -71,7 +71,7 @@ struct basisfunct {
    c2     - to translate the basisfunction at an integration point in a
             polynomial
    c3     - first and last integration point for which this function is nonzero
-   iks    - which knots are involved with this basisfunction - integrationpt 
+   iks    - which knots are involved with this basisfunction - integrationpt
    sumunc - sum_i B(x_i) over the uncensored data */
 
 
@@ -180,7 +180,7 @@ double *data0,*logs,*kts,*dpars;
 
 /* data  - datastructure for all the data
    spc   - datastructure for a model
-   definespace - allocation for a model 
+   definespace - allocation for a model
    i,j   - counters
    k     - one line for kdata
    nlsd- does the work
@@ -356,7 +356,7 @@ int ndmax,mind,strt,silent,*ad;
    mind  - minimum distance between knots
    strt  - were starting knots provided (1=yes)
    silent- should diagnostic info be printed? (1=yes)
-   logs  - log-likelihood of models 
+   logs  - log-likelihood of models
    ad    - fit during addition (1), deletion (2), not at all (0) */
 {
    struct space *current,*trynew;
@@ -413,12 +413,12 @@ int ndmax,mind,strt,silent,*ad;
          }while(oops!=0 && ndmax > (*current).ndim);
       }
       if(oops2>2)oops2--;
-      if(oops!=0){ 
+      if(oops!=0){
          if((*best).aic< -1.0e149)return 40;
          else swapspace(current,best);
          add=0;
       }
-      
+
       if(oops==0){
 /* compute aic */
          logs[(*current).ndim-1]=(*current).aic;
@@ -465,7 +465,7 @@ int ndmax,mind,strt,silent,*ad;
          (*best).ndim=ndmax-1;
          return oops;
       }
-      
+
 /* compute aic */
       if((*current).aic>logs[(*current).ndim-1]){
          logs[(*current).ndim-1]=(*current).aic;
@@ -571,7 +571,7 @@ short *same;
          h1[l+1]=h1[l]+1;
      }
    }
-   for(i=0;i<l;i++) h1[i]=0.5*(h1[i]+h1[i+1]);   
+   for(i=0;i<l;i++) h1[i]=0.5*(h1[i]+h1[i+1]);
    h2=h1[0];
    h3=0.;
    for(i=0;i<l;i++) {
@@ -593,7 +593,7 @@ short *same;
       h3=(rr[i]-h2)/(h3-h2);
       kts[i]=h3*ee[g2] + (1 - h3) * ee[g1];
    }
-}     
+}
 static void five01(rr,k,n,il)
 int k,n,il;
 double *rr;
@@ -602,7 +602,7 @@ double *rr;
    five00(rr,2*k-1,2*n);
    for(i=0;i<k;i++)rr[i]=2*rr[i];
    if(il==0) for(i=0;i<k;i++)rr[i]=1-rr[2*k-2-i];
-} 
+}
 static void five00(rr,k,n)
 int k,n;
 double *rr;
@@ -637,7 +637,7 @@ double *rr;
    }
    else i1=100;
    for(i=0;i<k;i++)rr[i]=(rr[i]-1)/(n-1.);
-} 
+}
 /******************************************************************************/
 static void luinverse(a,n)
 double **a;
@@ -764,7 +764,7 @@ int mind,silent;
 /* before first knot */
       if(i==0) nowloc1=findl(&ll,&uu,mind,sorted,nx,(*spc).knots[0]);
 /* after last knot */
-      if(i==(*spc).nk) 
+      if(i==(*spc).nk)
          nowloc1=findr(&ll,&uu,mind,sorted,nx,(*spc).knots[(*spc).nk-1]);
 /* in between knots */
       if(i>0 && i<(*spc).nk)nowloc1=
@@ -1096,10 +1096,10 @@ struct datastruct *data;
       if((*spc).iupp==1 && (*spc).basis[1].beta>=0)return 3;
 /* adjust beta */
       if((*spc).ilow==0)(*spc).basis[0].beta-=factor*(*spc).score[0];
-      else (*spc).basis[0].beta= 
+      else (*spc).basis[0].beta=
                  -myexp(factor*(*spc).score[0]+mylog(-(*spc).basis[0].beta));
       if((*spc).iupp==0)(*spc).basis[1].beta-=factor*(*spc).score[1];
-      else (*spc).basis[1].beta= 
+      else (*spc).basis[1].beta=
                  -myexp(factor*(*spc).score[1]+mylog(-(*spc).basis[1].beta));
       for(j=2;j<(*spc).ndim;j++)(*spc).basis[j].beta-=factor*(*spc).score[j];
       do{
@@ -1121,14 +1121,14 @@ struct datastruct *data;
             i=0;
             factor=factor/2.;
             if((*spc).ilow==0)(*spc).basis[0].beta+=factor*(*spc).score[0];
-            else (*spc).basis[0].beta= 
+            else (*spc).basis[0].beta=
                    -myexp(-factor*(*spc).score[0]+mylog(-(*spc).basis[0].beta));
             if((*spc).iupp==0)(*spc).basis[1].beta+=factor*(*spc).score[1];
-            else (*spc).basis[1].beta= 
+            else (*spc).basis[1].beta=
                    -myexp(-factor*(*spc).score[1]+mylog(-(*spc).basis[1].beta));
             for(j=2;j<(*spc).ndim;j++)
                (*spc).basis[j].beta+=factor*(*spc).score[j];
-            if(fabs(factor)< 0.00001 && 
+            if(fabs(factor)< 0.00001 &&
               (((*spc).iupp==1 && (*spc).basis[1].beta> -1.e8) ||
                ((*spc).ilow==1 && (*spc).basis[0].beta> -1.e8))) return 5;
             if(fabs(factor)< 0.00001) return 8;
@@ -1191,7 +1191,7 @@ struct datastruct *data;
 /* logl - uncensored */
    logl=0.;
    for(i=0;i<(*data).ndata;i++){
-      if((*data).same[i]==0) 
+      if((*data).same[i]==0)
          f=pol3(coef[(*data).idata[i]],(*data).data[i])-ctheta;
       logl+=f;
    }
@@ -1507,10 +1507,10 @@ int irmax;
 /* solve the quadratic problem */
    solver(mm2,k,1,r1,spc2);
 /* problems, a coefficient needing to be <0 is >=0 */
-   if(((*spc).ilow==1 && r1[0]>=0) ||( (*spc).iupp==1 && r1[1]>=0)){ 
+   if(((*spc).ilow==1 && r1[0]>=0) ||( (*spc).iupp==1 && r1[1]>=0)){
 /* only restrictions on the lower tail */
-      if((*spc).ilow==1 && (*spc).iupp==0){ 
-         if(irmax<=2){ 
+      if((*spc).ilow==1 && (*spc).iupp==0){
+         if(irmax<=2){
             for(i=0;i<((*spc2).nk)+2;i++){
                r1[i] = 0.;
                for(j=0;j<(*spc2).ndim;j++)
@@ -1534,16 +1534,16 @@ int irmax;
          (*spc2).basis[0].beta=0.;
          solver(mm2,k,2,r1,spc2);
          r1[0]+=x;
-      } 
+      }
 /* only restrictions on the upper tail */
-      if((*spc).ilow==0 && (*spc).iupp==1){  
+      if((*spc).ilow==0 && (*spc).iupp==1){
          if(irmax>=k-2){
             for(i=0;i<((*spc2).nk)+2;i++){
                r1[i] = 0.;
                for(j=0;j<(*spc2).ndim;j++)
                   r1[i]+=(*spc2).basis[j].beta*(*spc2).basis[j].c1[i];
             }
-            redo2(spc2,irmax,(*spc2).nk); 
+            redo2(spc2,irmax,(*spc2).nk);
             for(i=0;i<k+3;i++)for(j=0;j<k+3;j++)mm2[i][j]=0.;
             for(j=0;j<k+3;j++)for(i=0;i<k;i++)mm2[i][j]=(*spc2).basis[i].c1[j];
             for(i=k+1;i<k+3;i++)mm2[i][i]=1.;
@@ -1566,9 +1566,9 @@ int irmax;
          (*spc2).basis[1].beta=0.;
          solver(mm2,k,2,r1,spc2);
          r1[1]+=x;
-      } 
+      }
 /* restrictions on both tails */
-      if((*spc).ilow==1 && (*spc).iupp==1){ 
+      if((*spc).ilow==1 && (*spc).iupp==1){
          if(irmax>k-3 || irmax<=2){
             for(i=0;i<((*spc2).nk)+2;i++){
                r1[i] = 0.;
@@ -1599,8 +1599,8 @@ int irmax;
          solver(mm2,k,3,r1,spc2);
          r1[0]+=x;
          r1[1]+=y;
-      }  
-   } 
+      }
+   }
 /* record beta */
    for(i=0;i<(*spc2).ndim;i++)(*spc2).basis[i].beta=r1[i];
 /* get it to be a power basis */
@@ -1608,7 +1608,7 @@ int irmax;
       r1[i] = 0.;
       for(j=0;j<(*spc2).ndim;j++)
          r1[i]+=(*spc2).basis[j].beta*(*spc2).basis[j].c1[i];
-   } 
+   }
    for(i=irmax;i<(*spc2).nk;i++) r1[i+2]=r1[i+3];
    k=k-1;
    for(i=0;i<k+3;i++)for(j=0;j<k+3;j++)mm2[i][j]=0.;
@@ -1658,7 +1658,7 @@ struct space *spc;
    c[i2+2]= -1.-c[i1+2];
 }
 /******************************************************************************/
-/* This routine computes  Inv(H)%*%t(A)%*%Inv(A%*%Inv(H)%*%t(A))%*%A          
+/* This routine computes  Inv(H)%*%t(A)%*%Inv(A%*%Inv(H)%*%t(A))%*%A
    mm2 = A jxi, mm1 = Inv (H) ixi */
 static void solver (mm2,i,j,r1,spc)
 double **mm2,*r1;
@@ -1762,7 +1762,7 @@ struct datastruct *data;
          l=(*data).idata[m];
          if(l>=(*bn).c3[0]&&l<=(*bn).c3[1])
            (*bn).sumunc+=pol3((*bn).c2[l],(*data).data[m]);
-      } 
+      }
    }
 }
 /******************************************************************************/
@@ -1802,7 +1802,7 @@ int i,k;
          b+=c[i+j-1]*r*r*r;
       }
       for(j=0;j<4;j++)c[i+j]-=d[j]*b/a;
-   } 
+   }
 }
 /******************************************************************************/
 static void getonec1(c,i,t,j)
@@ -1814,7 +1814,7 @@ int i,j;
    c[i+2]=(c[i+3]*(t[j+1]-t[j+3])+t[j+1]-t[j])/(t[j+2]-t[j+1]);
    c[i+1]=-1.-c[i+3]-c[i+2];
 }
-   
+
 /******************************************************************************/
 static void setupspace(spc,data)
 struct space *spc;
@@ -1866,7 +1866,7 @@ struct datastruct *data;
          l=((*spc).nk);
          r=l+4.;
          if(l>3){
-         s=(double)(l+2)/((double)l-3.); 
+         s=(double)(l+2)/((double)l-3.);
          for(i=1;i<l-1;i++)  (*spc).iknots[i]=(((i-1)*s+1.)/r)*k;
          }
          else (*spc).iknots[1]=(k-1)/2.;
@@ -2185,7 +2185,7 @@ int *ipq,*lk,*lp;
    for(i=0;i<=nk;i++)ppl[i]=ppl[i]/ppl[nk];
    j=0;
 /* initialize */
-   if((*ipq)==0)zz=ppl;  
+   if((*ipq)==0)zz=ppl;
    else zz=kpl;
 /* before the first point */
    for(j=0;j<(*lp) && pq[j]<=zz[0];j++){
@@ -2241,7 +2241,7 @@ static void getp0(q,p,f,l,cf,k,b,cr)
 double *q,*p,*cf,k,b,cr;
 int f,l;
 {
-   int i; 
+   int i;
    if(b>0.5) for(i=f;i<=l;i++) p[i]=z2int(k,q[i],cf)/cr;
    else for(i=f;i<=l;i++) p[i]=z1int(q[i],cf,1)/cr;
 }
@@ -2250,7 +2250,7 @@ static void getq0(p,q,f,l,cf,k,b,cr)
 double *q,*p,*cf,k,b,cr;
 int f,l;
 {
-   int i; 
+   int i;
    if(b>0.5)for(i=f;i<=l;i++) q[i]=pqexpi(2,k,p[i]/cr,cf);
    else for(i=f;i<=l;i++) q[i]=pqexpi(1,k,p[i]/cr,cf);
 }
@@ -2259,7 +2259,7 @@ static void getp2(q,p,f,l,cf,k,b,cr)
 double *q,*p,*cf,k,b,cr;
 int f,l;
 {
-   int i; 
+   int i;
    if(b>0.5) for(i=f;i<=l;i++) p[i]=1.-z2int(q[i],k,cf)/cr;
    else for(i=f;i<=l;i++) p[i]=1.-z1int(q[i],cf,-1)/cr;
 }
@@ -2268,7 +2268,7 @@ static void getq2(p,q,f,l,cf,k,b,cr)
 double *q,*p,*cf,k,b,cr;
 int f,l;
 {
-   int i; 
+   int i;
    if(b>0.5)for(i=f;i<=l;i++) q[i]=pqexpi(4,k,1.-p[i]/cr,cf);
    else for(i=f;i<=l;i++) q[i]=pqexpi(3,k,1.-p[i]/cr,cf);
 }
@@ -2408,7 +2408,7 @@ int l;
 {
    double *v;
    int i;
-   v=(double *)Salloc(l+1,double); 
+   v=(double *)Salloc(l+1,double);
    for(i=0;i<=l;i++)v[i]=0.;
    return v;
 }
@@ -2439,7 +2439,7 @@ int l;
 {
    int i;
    short *v;
-   v=(short *)Salloc(l+1,short); 
+   v=(short *)Salloc(l+1,short);
    for(i=0;i<=l;i++)v[i]=0;
    return v;
 }
@@ -2449,7 +2449,7 @@ static int *isvector(l)
 int l;
 {
    int *v,i;
-   v=(int *)Salloc(l+1,int); 
+   v=(int *)Salloc(l+1,int);
    for(i=0;i<=l;i++)v[i]=0;
    return v;
 }
@@ -2592,7 +2592,7 @@ double t1,t2,*coef,*results;
    int i;
    if(b1!=0.){
       b3[0]=(double)1./b1;
- 
+
       f1 = b3[0];
       f2 = b3[0];
       results[0]=fctf2(b0,b1,t1,t2,f1,f2);
@@ -2790,7 +2790,7 @@ int r,c;
 {
    int i;
    double **m;
-   m=(double **) Salloc(r+1,double*); 
+   m=(double **) Salloc(r+1,double*);
    for(i=0;i<=r;i++) m[i]=dsvector(c);
    return m;
 }
