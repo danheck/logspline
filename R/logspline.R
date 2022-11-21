@@ -71,7 +71,7 @@ qoldlogspline <- function(p, fit)
 
 roldlogspline <- function(n, fit)
 {
-    if(class(fit)!="oldlogspline")
+    if(!inherits(fit, "oldlogspline"))
        stop("fit is not an oldlogspline object")
     pp <- runif(n)
     qoldlogspline(pp, fit)
@@ -80,7 +80,7 @@ roldlogspline <- function(n, fit)
 doldlogspline <- function(q, fit)
 {
     x <- q
-    if(class(fit)!="oldlogspline")
+    if(!inherits(fit, "oldlogspline"))
        stop("fit is not an oldlogspline object")
         q <- unstrip(q)
     y <- fit$coef[1] + x * fit$coef[2]
@@ -100,7 +100,7 @@ doldlogspline <- function(q, fit)
 plot.oldlogspline <- function(x, n = 100, what = "d", xlim, xlab = "", ylab = "", type = "l", add = FALSE, ...)
 {
     fit <- x
-    if(class(fit)!="oldlogspline")
+    if(!inherits(fit, "oldlogspline"))
        stop("fit is not an oldlogspline object")
         if(missing(xlim)) {
                 u1 <- qoldlogspline(0.01, fit)
@@ -136,7 +136,7 @@ print.oldlogspline <- function(x,...)
 }
 summary.oldlogspline <- function(object,...)
 {
-    if(class(object)!="oldlogspline")
+    if(!inherits(object, "oldlogspline"))
        stop("fit is not an oldlogspline object")
     fit <- object
     if(fit$delete==FALSE)stop(paste("summary.oldlogspline can only provide",
@@ -182,7 +182,7 @@ summary.oldlogspline <- function(object,...)
         cat(paste("penalty(AIC) was ", round(ul, 2),", the default (BIC) ",
                 "would have been", round(log(um), 2),"\n"))
     if(min(kk) > 3 && fit$delete==TRUE){
-        cat(paste( "models with fewer than", kk[1],"knots ", 
+        cat(paste( "models with fewer than", kk[1],"knots ",
                   "can be fitted, but they are not optimal for\n"))
         cat(paste("the present choice of penalty - choose penalty in",
                   "oldlogspline larger\nto see these fits\n"))
@@ -190,7 +190,7 @@ summary.oldlogspline <- function(object,...)
     if(min(kk) > 3 && fit$delete==3)
         cat(paste("models with fewer than", kk[1],"knots ",
                     "were not fitted because of convergence problems\n"))
-      
+
     invisible()
 }
 
@@ -242,7 +242,7 @@ oldlogspline <- function(uncensored, right, left, interval, lbound, ubound,
         if(nsample[2]>1)
             nsample[6] <- sum(uncensored[2:nsample[2]] !=
                 uncensored[1:(nsample[2]-1)]) + 1 + nsample[6]
-        else 
+        else
             nsample[6] <- nsample[6]+1
     }
 # we can not run on only right or left censored data
@@ -501,22 +501,22 @@ logspline <- function(x, lbound, ubound, maxknots=0, knots, nknots=0,
       if(z$ip[1] == 2) warning("error while solving system")
       if(z$ip[1] == 8) warning("too much step-halving")
       if(z$ip[1] == 5) warning("too much step-halving")
-      if(z$ip[1] == 7) 
+      if(z$ip[1] == 7)
          warning("numerical problems, likely tail related. Try lbound/ubound")
       if(z$ip[1] == 1) warning("no convergence")
       i <- 0
-      if(missing(knots))i<- 1     
-      if(z$ip[1] == 3 && i==1) 
+      if(missing(knots))i<- 1
+      if(z$ip[1] == 3 && i==1)
         warning("right tail extremely heavy, try running with ubound")
-      if(z$ip[1] == 4 && i==1) 
+      if(z$ip[1] == 4 && i==1)
         warning("left tail extremely heavy, try running with lbound")
-      if(z$ip[1] == 6 && i==1) 
+      if(z$ip[1] == 6 && i==1)
         warning("both tails extremely heavy, try running with lbound and ubound")
-      if(z$ip[1] == 3 && i==0) 
+      if(z$ip[1] == 3 && i==0)
         warning("right tail too heavy or not enough knots in right tail")
-      if(z$ip[1] == 4 && i==0) 
+      if(z$ip[1] == 4 && i==0)
         warning("left tail too heavy or not enough knots in left tail")
-      if(z$ip[1] == 6 && i==0) 
+      if(z$ip[1] == 6 && i==0)
         warning("both tails too heavy or not enough knots in both tail")
       if(error.action==0) stop("fatal error")
       if(error.action==1) {
@@ -545,7 +545,7 @@ logspline <- function(x, lbound, ubound, maxknots=0, knots, nknots=0,
    kk <- kk[logl[, 2] == 0 ]
    if(length(kk)>0)logl <- logl[-kk,]
    # bye bye
-   fit <- list(call = call, nknots = z$ip[2], coef.pol = z$coef[1:2], coef.kts = 
+   fit <- list(call = call, nknots = z$ip[2], coef.pol = z$coef[1:2], coef.kts =
       z$coef[2 + (1:z$ip[2])], knots = z$kts[1:z$ip[2]], maxknots = z$ip[3]+2,
       penalty = z$dp[1], bound = c(ilow, low, iupp, upp), samples = nsample,
       logl = logl, range = mm, mind = z$ip[7])
@@ -554,7 +554,7 @@ logspline <- function(x, lbound, ubound, maxknots=0, knots, nknots=0,
 }
 plogspline <- function(q, fit)
 {
-    if(class(fit)!="logspline")
+    if(!inherits(fit, "logspline"))
        stop("fit is not a logspline object")
    if(!missing(q))q <- unstrip(q)
     sq <- rank(q)
@@ -571,11 +571,11 @@ plogspline <- function(q, fit)
     zz <- z$pp[sq]
     if(fit$bound[1] > 0) zz[q<fit$bound[2]] <- 0
     if(fit$bound[3] > 0) zz[q>fit$bound[4]] <- 1
-    zz 
+    zz
 }
 qlogspline <- function(p, fit)
 {
-    if(class(fit)!="logspline")
+    if(!inherits(fit, "logspline"))
        stop("fit is not a logspline object")
    if(!missing(p))p <- unstrip(p)
     sp <- rank(p)
@@ -596,19 +596,19 @@ qlogspline <- function(p, fit)
 }
 rlogspline <- function(n, fit)
 {
-    if(class(fit)!="logspline")
+    if(!inherits(fit, "logspline"))
        stop("fit is not a logspline object")
     pp <- runif(n)
     qlogspline(pp, fit)
 }
 dlogspline <- function(q, fit)
 {
-    if(class(fit)!="logspline")
+    if(!inherits(fit, "logspline"))
        stop("fit is not a logspline object")
    if(!missing(q))q <- unstrip(q)
     x <- q
     y <- fit$coef.pol[1] + x * fit$coef.pol[2]
-    for(i in 1:length(fit$knots)) 
+    for(i in 1:length(fit$knots))
        y <- y + fit$coef.kts[i] * ((abs(x - fit$knots[i]) +x- fit$knots[i])/2)^3
     y <- exp(y)
     if(fit$bound[1] > 0) y[x < fit$bound[2]] <- 0
@@ -618,7 +618,7 @@ dlogspline <- function(q, fit)
 plot.logspline <-function(x, n = 100, what = "d", add = FALSE, xlim, xlab = "", ylab = "", type = "l", ...)
 {
         fit <- x
-    if(class(fit)!="logspline")
+    if(!inherits(fit, "logspline"))
        stop("fit is not a logspline object")
         if(add){
                 plim <- (par()$usr)[1:2]
@@ -660,7 +660,7 @@ print.logspline <- function(x,...)
 summary.logspline <- function(object,...)
 {
         fit <- object
-    if(class(fit)!="logspline")
+    if(!inherits(fit, "logspline"))
        stop("fit is not a logspline object")
    ul <- fit$penalty
    um <- fit$samples[1]
