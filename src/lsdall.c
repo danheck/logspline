@@ -27,14 +27,180 @@ void F77_NAME(xdsidi)(double[][NC], int *, int *, int *, double *, int *, double
 void F77_NAME(xssort)(double *, double *, int *, int *);
 
 static double knots[NC],coef[NC][4][NC],zheta[NC],czheta,xg[NC],dfunpar[6];
-static int nknots,ng3[NC],ng4[NC],piecedens(); /* where(); */
-static int removeknot(),knotnumber(),numbertester();
-static double liter(),erroradjust(),middle(),error2(),likeli(),linsearch();
-static void fits(),setbounds();
-static void coeff() ,start1() ,start2() ,suffstat1() ,suffstat2() ,knotplace();
-static double dens3(),numint(),expin(),dens33(),onesearch();
-static double fun2(),tails(),fun48(),numints(),expin2();
-static void intnum2(),intnum3(),intnum4();
+static int nknots,ng3[NC],ng4[NC];
+static int piecedens(double sample[],
+                     double smp2[],
+                     double smp3[],
+                     int nsample[]); /* where(); */
+static int removeknot(double info[][NC],
+                      double coef2[][NC]);
+static int knotnumber(int idelete,
+                      int nsample[],
+                      int nknots,
+                      int SorC[]);
+static int numbertester(double aa);
+static double liter(double info[][NC],
+                    double sufficient[][2],
+                    double bound[],
+                    int SorC[],
+                    int nsample[],
+                    double sample[],
+                    int accuracy,
+                    int *itrouble);
+static double erroradjust(double shift[]);
+static double middle(double info[][NC],
+                     double shift[],
+                     double sufficient[][2],
+                     double bound[],
+                     int accuracy,
+                     int nsample[],
+                     double sample[],
+                     double zheta[],
+                     int what);
+static double error2(double shift[],
+                     double rvr[]);
+static double likeli(double candidate[],
+                     int nsample[],
+                     double sample[],
+                     double bound[],
+                     int accuracy);
+static double linsearch(double shift[],
+                        double oldll,
+                        double bound[],
+                        int nsample[],
+                        double sample[],
+                        int accuracy);
+static void fits(double xcoef2[][NC],
+                 double xzheta[],
+                 double xczheta,
+                 double ycoef[],
+                 int xiknots[],
+                 int xnknots);
+static void setbounds(double bound[],
+                      double cbound[],
+                      int nsample[]);
+static void coeff(double coef2[][NC]);
+static void start1(double crossprods[][NC],
+                   double derivatives[],
+                   double sample[],
+                   int nsample[]);
+static void start2(double crossprods[][NC],
+                   double derivatives[],
+                   double coef2[][NC],
+                   int nkstart,
+                   int iremove);
+static void suffstat1(double suffcombine[][2],
+                      double sample[],
+                      int nsample[]);
+static void suffstat2(double suffcombine[][2],
+                      double coef2[][NC],
+                      double sufficient[][2]);
+static void knotplace(int iknots[],
+                      double rknots[],
+                      int iknotauto,
+                      double bound[],
+                      double sample[],
+                      int nsample[],
+                      int SorC[],
+                      double smp2[],
+                      double smp3[],
+                      double qt[]);
+static double dens3(double x);
+static double numint(double k1,
+                     double k2,
+                     double (*fun)(),
+                     int accuracy);
+static double expin(int version,
+                    double t1,
+                    double t2,
+                    double a[]);
+static double dens33(double x);
+static double onesearch(double rt,
+                        double shift[],
+                        int accuracy,
+                        double bound[],
+                        int *err,
+                        int nsample[],
+                        double sample[]);
+static double fun2(double x);
+static double tails(double info[][NC],
+                    double shift[],
+                    double coef[][4][NC],
+                    double bound[],
+                    double knots[],
+                    double zheta[],
+                    int nknots,
+                    int what);
+static double fun48(double w,
+                    double x,
+                    double vv[],
+                    int ip);
+static double numints(double vv[],
+                      double k1,
+                      double k2,
+                      double (*fun)(),
+                      int accuracy,
+                      int ip);
+static double expin2(int version,
+                     double t1,
+                     double t2,
+                     double aa[],
+                     double b1,
+                     double b0);
+static void intnum2(double x1,
+                    double x2,
+                    double qolint[][NC+1],
+                    double shift[],
+                    double info[][NC],
+                    int n1,
+                    int n2,
+                    int what);
+static void intnum3(double x,
+                    double qolint[][NC+1],
+                    double d1,
+                    double e1,
+                    int vs,
+                    double bd,
+                    double shift[],
+                    double info[][NC],
+                    int n1,
+                    int n2,
+                    int what);
+static void intnum4(double x,
+                    double qolint[][NC+1],
+                    double d1,
+                    double e1,
+                    int vs,
+                    double bd,
+                    double shift[],
+                    double info[][NC],
+                    int n1,
+                    int n2,
+                    int what);
+
+void logcensor(int *idelete,
+               int *iknotauto,
+               double sample[],
+               int nsample[],
+               double bound[],
+               int SorC[],
+               int *ynknots,
+               double yknots[],
+               double ycoef[],
+               double *alpha,
+               double wk[],
+               double wk2[],
+               double logl[]);
+static double numint(double k1,
+                     double k2,
+                     double (*fun)(),
+                     int accuracy);
+static double fun48(double w,
+                    double x,
+                    double vv[],
+                    int ip);
+
+
 /******************************************************************************/
 /* this is the main program                                                   */
 /* remove follows at the end                                                  */
