@@ -77,7 +77,9 @@ struct basisfunct {
 
 static int *isvector(int l);
 static short *issvector(int l);
-static double *dsvector(int l),**dsmatrix(int r, int c);
+static double *dsvector(int l);
+static double **dsmatrix(int r,
+                         int c);
 static int nlsd(struct space *best,
                 struct datastruct *data,
                 double alpha,
@@ -87,23 +89,74 @@ static int nlsd(struct space *best,
                 int silent,
                 double *logs,
                 int *ad);
-static struct space *definespace();
-static void getsame();
-static void five();
-static void five01();
-static void five00();
-static void lubksb();
-static int ludcmp();
-static int adddim();
-static int findyl();
-static int findyr();
-static int findl();
-static int findr();
-static int findm();
-static int dlocation();
-static void betaadd();
-static int iter();
-static int iterx();
+static struct space *definespace(int nd);
+static void getsame(double *x,
+                    int n,
+                    short *s);
+static void five(double *data,
+                 double *kts,
+                 int *intpars,
+                 short *same);
+static void five01(double *rr,
+                   int k,
+                   int n,
+                   int il);
+static void five00(double *rr,
+                   int k,
+                   int n);
+static void lubksb(double **a,
+                   int n,
+                   int *indx,
+                   double b[]);
+static int ludcmp(double **a,
+                  int n,
+                  int *indx,
+                  double *d);
+static int adddim(struct space *spc,
+                  struct space *spc2,
+                  struct datastruct *data,
+                  int mind,
+                  int silent);
+static int findyl(int u,
+                  int l,
+                  double *x);
+static int findyr(int u,
+                  int l,
+                  double *x);
+static int findl(int *ll,
+                 int *uu,
+                 int mind,
+                 double *x,
+                 int nx,
+                 double knt);
+static int findr(int *ll,
+                 int *uu,
+                 int mind,
+                 double *x,
+                 int nx,
+                 double knt);
+static int findm(int *ll,
+                 int *uu,
+                 int mind,
+                 double *x,
+                 int nx,
+                 double k0,
+                 double k1);
+static int dlocation(int what,
+                     double *x,
+                     int nx,
+                     double k);
+static void betaadd(struct space *spc,
+                    struct space *spc2,
+                    int besti);
+static int iter(struct space *spc,
+                struct datastruct *data,
+                int silent,
+                double *xxa);
+static int iterx(struct space *spc,
+                 struct datastruct *data,
+                 int silent,
+                 double *xxa);
 static double pompall();
 static void savecode1();
 static int savecoden();
