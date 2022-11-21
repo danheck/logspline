@@ -110,6 +110,7 @@ static double numint(double k1,
                      double k2,
                      double (*fun)(),
                      int accuracy);
+
 static double expin(int version,
                     double t1,
                     double t2,
@@ -191,14 +192,6 @@ void logcensor(int *idelete,
                double wk[],
                double wk2[],
                double logl[]);
-static double numint(double k1,
-                     double k2,
-                     double (*fun)(),
-                     int accuracy);
-static double fun48(double w,
-                    double x,
-                    double vv[],
-                    int ip);
 
 
 /******************************************************************************/
