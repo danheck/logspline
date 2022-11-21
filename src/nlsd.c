@@ -78,7 +78,15 @@ struct basisfunct {
 static int *isvector(int l);
 static short *issvector(int l);
 static double *dsvector(int l),**dsmatrix(int r, int c);
-static int nlsd();
+static int nlsd(struct space *best,
+                struct datastruct *data,
+                double alpha,
+                int ndmax,
+                int mind,
+                int strt,
+                int silent,
+                double *logs,
+                int *ad);
 static struct space *definespace();
 static void getsame();
 static void five();
