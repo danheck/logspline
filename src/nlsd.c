@@ -157,58 +157,204 @@ static int iterx(struct space *spc,
                  struct datastruct *data,
                  int silent,
                  double *xxa);
-static double pompall();
-static void savecode1();
-static int savecoden();
-static void initk();
-static double rao();
-static double praox();
-static int getnewc2();
-static double save22coden();
-static void remdim();
-static void betarem();
-static void redo1();
-static void redo2();
-static void solver();
-static void getc2();
-static void getc1();
-static void getonec1();
-static void setupspace();
-static int startspace();
-static void startnow();
-static int rearrange();
-static void getip();
-static void getp0();
-static void getq0();
-static void getp2();
-static void getq2();
-static void getp1();
-static void getq1();
-static double z1int();
-static double z2int();
-static double z3int();
-static double pqexpi();
-static double getf();
-static double mylog();
-static double myexp();
-static void m1int();
-static void l1int();
-static void l2int();
-static double fctf1();
-static double fctf2();
-static double pol3();
-static double inp3();
-static double mat3();
-static void swapspace();
-static void quadalloc();
+static double pompall(struct space *spc,
+                      struct datastruct *data,
+                      int what,
+                      int *xp);
+static void savecode1(struct space *spc,
+                      int j,
+                      double *cz,
+                      double **czz,
+                      double *what);
+static int savecoden(struct space *spc,
+                     int i0,
+                     int i1,
+                     double *cz,
+                     double **czz);
+static void initk(int i,
+                  int ndim,
+                  double *v,
+                  double **mm,
+                  double *v2,
+                  double **mm2);
+static double rao(struct space *spc,
+                  struct datastruct *data,
+                  double loc);
+static double praox(struct space *spc,
+                    struct datastruct *data,
+                    struct basisfunct *bb,
+                    double *iext,
+                    double intext[7],
+                    double c2ext[4],
+                    int j0ext);
+static int getnewc2(struct space *spc,
+                    struct datastruct *data,
+                    double loc,
+                    struct basisfunct *bb,
+                    double intext[7],
+                    double c2ext[4]);
+static double save22coden(struct space *spc,
+                          double *czz,
+                          struct basisfunct *bb,
+                          double int2ext[7],
+                          int j0ext,
+                          double c2ext[4]);
+static void remdim(struct space *spc,
+                   struct datastruct *data,
+                   struct space *spc2,
+                   int silent);
+static void betarem(struct space *spc2,
+                    struct space *spc,
+                    int irmax);
+static void redo1(struct space *spc,
+                  int irmax,
+                  int k);
+static void redo2(struct space *spc,
+                  int irmax,
+                  int k);
+static void solver(double **mm2,
+                   int i,
+                   int j,
+                   double *r1,
+                   struct space *spc);
+static void getc2(struct space *spc,
+                  struct datastruct *data);
+static void getc1(double *t,
+                  double *c,
+                  int i,
+                  int k);
+static void getonec1(double *c,
+                     int i,
+                     double *t,
+                     int j);
+static void setupspace(struct space *spc,
+                       struct datastruct *data);
+static int startspace(struct space *spc,
+                      struct datastruct *data,
+                      int strt,
+                      int silent);
+static void startnow(struct space *spc,
+                     struct datastruct *data);
+static int rearrange(struct space *spc,
+                     struct datastruct *data);
+static void getip(struct space *spc,
+                  struct datastruct *data);
+static void getp0(double *q,
+                  double *p,
+                  int f,
+                  int l,
+                  double *cf,
+                  double k,
+                  double b,
+                  double cr);
+static void getq0(double *p,
+                  double *q,
+                  int f,
+                  int l,
+                  double *cf,
+                  double k,
+                  double b,
+                  double cr);
+static void getp2(double *q,
+                  double *p,
+                  int f,
+                  int l,
+                  double *cf,
+                  double k,
+                  double b,
+                  double cr);
+static void getq2(double *p,
+                  double *q,
+                  int f,
+                  int l,
+                  double *cf,
+                  double k,
+                  double b,
+                  double cr);
+static void getp1(double *q,
+                  double *p,
+                  int f,
+                  int l,
+                  double *cf,
+                  double k0,
+                  double k1,
+                  double p0,
+                  double p1);
+static void getq1(double *p,
+                  double *q,
+                  int f,
+                  int l,
+                  double *cf,
+                  double k0,
+                  double k1,
+                  double p0,
+                  double p1);
+static double z1int(double t1,
+                    double *c0,
+                    int j);
+static double z2int(double t1,
+                    double t2,
+                    double *c0);
+static double z3int(double k1,
+                    double k2,
+                    double *coef,
+                    int accuracy);
+static double pqexpi(int version,
+                     double t,
+                     double p,
+                     double *cf);
+static double getf(double *c,
+                   double x);
+static double mylog(double x);
+static double myexp(double x);
+static void m1int(double *vv,
+                  double k1,
+                  double k2,
+                  int what,
+                  double *coef,
+                  int accuracy);
+static void l1int(double *results,
+                  double t1,
+                  double *coef,
+                  int j,
+                  int what);
+static void l2int(double *results,
+                  double t1,
+                  double t2,
+                  double *coef,
+                  int what);
+static double fctf1(double b0,
+                    double b1,
+                    double t1,
+                    double f1,
+                    int j);
+static double fctf2(double b0,
+                    double b1,
+                    double t1,
+                    double t2,
+                    double f1,
+                    double f2);
+static double pol3(double *coef,
+                   double x);
+static double inp3(double *c1,
+                   double *c2);
+static double mat3(double *c1,
+                   double *c2,
+                   double *c3);
+static void swapspace(struct space *s1,
+                      struct space *s2);
+static void quadalloc(void);
 /* allocation */
 
-static int lusolve2();
-static void luinverse();
+static int lusolve2(double **a,
+                    int n,
+                    double *b);
+static void luinverse(double **a,
+                      int n);
 /* matrix inversion, solve a system */
 
-static double ctheta,*betaaddsorted;
-static double **kints,*cuu;
+static double ctheta, *betaaddsorted;
+static double **kints, *cuu;
 /* see piter - partial integrals and so on, which we want to keep */
 static struct basisfunct *bbx;
 /* storage */
@@ -217,6 +363,22 @@ static int *rearix,*getiips,*luwi;
 static double *fiveee,*fiveh1,*fiverr,*betaaddv1,*betaremr1,*raoss,*luw,*luw2,**luww;
 static double *itertmp1,*itertmp2,*rearsorted,**solc1,**solc2,**solc3;
 static double **itertmp3,**pompcoef,**betaaddt1,**raoii,**raoc2,**betaremm2;
+
+void nlogcensorx(int *intpars);
+void nlogcensor(int *intpars,
+                double *data0,
+                double *dpars,
+                double *logs,
+                int *ad,
+                double *kts);
+void rpqlsd(double *coef,
+            double *knots,
+            double *bnd,
+            int *ipq,
+            double *pq,
+            int *lk,
+            int *lp);
+
 /******************************************************************************/
 void nlogcensorx(intpars)
 int *intpars;
