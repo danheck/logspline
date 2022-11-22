@@ -1,6 +1,6 @@
 Package: logspline
 Version: 2.1.18
-Date: 2022-11-21
+Date: 2022-11-22
 Maintainer: Charles Kooperberg <clk@fredhutch.org>
 Title: Routines for Logspline Density Estimation
 Authors@R: c(person("Charles", "Kooperberg", role = c("aut", "cre"),
@@ -9,7 +9,7 @@ Authors@R: c(person("Charles", "Kooperberg", role = c("aut", "cre"),
 	            comment = "LINPACK routines in src"),
 	     person("Jack", "Dongarra", role = "ctb",
 	            comment = "LINPACK routines in src"),
-	     person("Daniel", "Heck", role = "ctb", 
+	     person("Daniel W.", "Heck", role = "ctb", 
 	            email="daniel.heck@uni-marburg.de",
 	            comment = "CRAN maintenance"))
 Description: Contains routines for logspline density estimation.
