@@ -198,11 +198,19 @@ void logcensor(int *idelete,
 /* this is the main program                                                   */
 /* remove follows at the end                                                  */
 
-void logcensor(idelete,iknotauto,sample,nsample,bound,
-              SorC,ynknots,yknots,ycoef,alpha,wk,wk2,logl)
-
-int *idelete,*iknotauto,nsample[],SorC[],*ynknots;
-double bound[],sample[],yknots[],wk[],wk2[],ycoef[],*alpha,logl[];
+void logcensor(int *idelete,
+               int *iknotauto,
+               double sample[],
+               int nsample[],
+               double bound[],
+               int SorC[],
+               int *ynknots,
+               double yknots[],
+               double ycoef[],
+               double *alpha,
+               double wk[],
+               double wk2[],
+               double logl[])
 /* these quantities are defined in the file where they originated and lhead.h */
 
 {
@@ -425,9 +433,8 @@ int i,j,nkstart,iremove=0,iknots[NC],xiknots[NC];
 }
 /******************************************************************************/
 
-static int removeknot(info,coef2)
-
-double info[][NC],coef2[][NC];
+static int removeknot(double info[][NC],
+                      double coef2[][NC])
 /* all described in originating files and lhead.h                             */
 
 {
@@ -489,9 +496,13 @@ double info[][NC],coef2[][NC];
    return irmax;
 }
 /*****************************************************************************/
-static void fits(xcoef2,xzheta,xczheta,ycoef,xiknots,xnknots)
-double xzheta[],xczheta,ycoef[],xcoef2[][NC];
-int xiknots[],xnknots;
+static void fits(double xcoef2[][NC],
+                 double xzheta[],
+                 double xczheta,
+                 double ycoef[],
+                 int xiknots[],
+                 int xnknots)
+
 {
    int i,j;
    for(i=0;i< NC;i++)ycoef[i]=0.;
@@ -511,10 +522,14 @@ int xiknots[],xnknots;
 /* setbounds follows at the end                                               */
 
 
-static double liter(info,sufficient,bound,SorC,nsample,sample,accuracy,itrouble)
-
-double info[][NC],sufficient[][2],bound[],sample[];
-int SorC[],accuracy,nsample[],*itrouble;
+static double liter(double info[][NC],
+                    double sufficient[][2],
+                    double bound[],
+                    int SorC[],
+                    int nsample[],
+                    double sample[],
+                    int accuracy,
+                    int *itrouble)
 
 {
    int counter=0,infol,i1,i2,i3,kpvt[NC],jaja1,i4,iii[4],ithere,i7,nrc=0,nrc2=0;
@@ -908,9 +923,10 @@ int SorC[],accuracy,nsample[],*itrouble;
       SorC[0] = -SorC[0];
    return newlikelihood;
 }
-static void setbounds(bound,cbound,nsample)
-double bound[],cbound[];
-int nsample[];
+static void setbounds(double bound[],
+                      double cbound[],
+                      int nsample[])
+
 {
 /* set the integration boundaries. O.k., this is quite complicated. There are 2
    arrays that determine how far we are integrating in each tail.
@@ -986,8 +1002,7 @@ E                            bound[2]>=cbound[2]:
 /* this function computes the stopcriterion (zerror) and adjust the stepsize
    (shift) if this is too large.                                              */
 
-static double erroradjust(shift)
-double shift[];
+static double erroradjust(double shift[])
 
 {
    double r1,r2;
